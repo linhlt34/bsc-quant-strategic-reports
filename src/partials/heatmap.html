@@ -1,0 +1,21 @@
+<span class="sec-label">{{ heatmap.sectionLabel }}</span>
+<p class="sec-sub" data-edit>{{ heatmap.sectionSub }}</p>
+
+<div class="heatmap-wrap">
+  <table class="heatmap-table" aria-label="Heatmap lợi suất hàng tháng">
+    <thead>
+      <tr>
+        <th class="th-year">Năm</th>
+        ##HEATMAP_HEADERS##
+      </tr>
+    </thead>
+    <tbody id="heatmap-body">
+      ##HEATMAP_ROWS##
+    </tbody>
+  </table>
+  <div class="heatmap-legend">
+    <span>Âm</span>
+    <div class="legend-bar"></div>
+    <span>Dương</span>
+  </div>
+</div>

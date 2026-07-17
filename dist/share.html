@@ -1,0 +1,935 @@
+﻿<!DOCTYPE html>
+<html lang="vi">
+<head>
+<meta charset="UTF-8">
+<title>Danh mục Đón sóng Nâng hạng Thị trường</title>
+<style>
+:root {
+  --bsc-blue:   #295CA9;
+  --bsc-teal:   #009B87;
+  --bsc-gold:   #FFC132;
+  --positive:   #16A34A;
+  --negative:   #DC2626;
+  --neutral:    #64748B;
+  --text-1:     #334155;
+  --text-2:     #475569;
+  --text-3:     #64748B;
+  --bg-canvas:  #F1F5F9;
+  --surface:    #F8FAFC;
+  --card:       #FFFFFF;
+  --tint-blue:  #EEF4FC;
+  --tint-teal:  #E6F5F3;
+  --line:       #E2E8F0;
+  --fs-display: 38px;
+  --fs-h1:      28px;
+  --fs-h2:      22px;
+  --fs-h3:      18px;
+  --fs-h4:      16px;
+  --fs-body-lg: 15px;
+  --fs-body:    14px;
+  --fs-label:   12px;
+  --fs-caption: 12px;
+  --page-pad:   32px;
+  --gap-section: 24px;
+  --gap-card:   12px;
+  --card-pad:   16px;
+}
+
+    /* Embedded theme.css for standalone use */
+    /* ── 1. IMPORT FONTS CHỮ (ĐÃ CHUYỂN SANG NUNITO) ── */
+    @import url('https://fonts.googleapis.com/css2?family=Nunito:wght@400;500;600;700;800;900&display=swap');
+
+    /* Theme variables are injected from theme.config.json by build.ps1. */
+/* ── 3. RESET HỆ THỐNG & LAYOUT CƠ BẢN ── */
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    html,
+    body {
+      background: #F1F5F9;
+    }
+
+    body {
+      font-family: 'Nunito', system-ui, -apple-system, sans-serif;
+      color: var(--text);
+      display: flex;
+      justify-content: center;
+      padding: var(--gap-section, 24px) 12px;
+      line-height: 1.5;
+      -webkit-font-smoothing: antialiased;
+    }
+
+    .mono {
+      font-family: 'Nunito', system-ui, -apple-system, sans-serif;
+    }
+
+    button,
+    input,
+    select,
+    textarea,
+    table,
+    th,
+    td,
+    svg text {
+      font-family: 'Nunito', system-ui, -apple-system, sans-serif !important;
+    }
+
+    /* Khung bao ngoài của tài liệu và từng trang giấy (sheet) */
+    .doc {
+      width: 100%;
+      max-width: 1000px;
+      display: flex;
+      flex-direction: column;
+      gap: var(--gap-section, 24px);
+    }
+
+    .sheet {
+      width: 100%;
+      background: var(--card);
+      border: 1px solid var(--line);
+      border-radius: 16px;
+      overflow: hidden;
+      box-shadow: 0 4px 20px rgba(15, 23, 42, 0.05);
+    }
+
+    /* ── 4. BRAND IDENTITY (ĐẦU TRANG DÙNG CHUNG) ── */
+    .topbar {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 16px var(--page-pad, 32px);
+      border-bottom: 3px solid var(--bsc-blue);
+      background: var(--blue-tint);
+    }
+
+    .brand {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+
+    .brand img {
+      height: 42px;
+      width: auto;
+      display: block;
+    }
+
+    .brand .name {
+      font-weight: 800;
+      font-size: 19px;
+      letter-spacing: -0.2px;
+      color: var(--bsc-blue);
+    }
+
+    .brand .name span {
+      color: var(--dim);
+      font-weight: 500;
+      font-size: 14px;
+      letter-spacing: 1px;
+      margin-left: 6px;
+      border-left: 1px solid var(--line);
+      padding-left: 12px;
+    }
+
+    .topbar .meta {
+      text-align: right;
+      font-size: var(--fs-label, 11.5px);
+      color: var(--dim);
+    }
+
+    .topbar .meta b {
+      color: var(--bsc-blue);
+    }
+
+    /* ── 5. TIÊU ĐỀ PHÂN KHU (HEADINGS) ── */
+    .sec-label {
+      font-size: 11.5px !important;
+      letter-spacing: 1.5px !important;
+      color: var(--bsc-blue) !important;
+      font-weight: 700 !important;
+      text-transform: uppercase !important;
+      padding: calc(var(--gap-section, 24px) + 4px) var(--page-pad, 32px) 12px !important;
+      display: block !important;
+      line-height: 1.4 !important;
+    }
+
+    .sec-sub {
+      font-size: var(--fs-caption, 12.5px);
+      color: var(--dim);
+      padding: 0 var(--page-pad, 32px) 16px;
+      margin-top: -4px;
+      max-width: 720px;
+      line-height: 1.6;
+    }
+
+    /* ── 6. ĐỊNH DẠNG BẢNG TIÊU CHUẨN (PERFORMANCE & ATTRIBUTION TABLES) ── */
+    .board-wrap {
+      padding: 0 var(--page-pad, 32px) var(--gap-section, 24px);
+      overflow-x: auto;
+      -webkit-overflow-scrolling: touch;
+    }
+
+    table {
+      width: 100%;
+      min-width: 700px;
+      border-collapse: collapse;
+      table-layout: fixed;
+    }
+
+    thead th {
+      text-align: left;
+      font-size: 10.5px;
+      letter-spacing: 0.6px;
+      color: var(--dim);
+      font-weight: 700;
+      padding: 12px 8px;
+      border-bottom: 2px solid var(--bsc-blue);
+      text-transform: uppercase;
+    }
+
+    thead th.num {
+      text-align: right;
+    }
+
+    tbody td {
+      padding: 12px 8px;
+      border-bottom: 1px solid var(--line);
+      font-size: var(--fs-body, 13px);
+      vertical-align: middle;
+    }
+
+    tbody tr:hover {
+      background: var(--surface);
+    }
+
+    tbody tr:last-child td {
+      border-bottom: none;
+      font-weight: 700;
+      background: var(--surface);
+    }
+
+    td.ticker {
+      font-weight: 700;
+      font-size: var(--fs-body, 13.5px);
+      color: var(--bsc-blue);
+    }
+
+    td.num {
+      text-align: right;
+      font-variant-numeric: tabular-nums;
+      font-family: 'Nunito', system-ui, -apple-system, sans-serif;
+      font-weight: 600;
+    }
+
+    td.green {
+      color: #22C55E;
+    }
+
+    td.red {
+      color: #EF4444;
+    }
+
+    /* ── 7. FOOTER CHÂN TRANG DÙNG CHUNG ── */
+    footer {
+      margin-top: 8px;
+      padding: 20px 32px 24px;
+      border-top: 1px solid var(--line);
+      display: flex;
+      justify-content: space-between;
+      gap: 16px;
+    }
+
+    footer .disc {
+      font-size: 10px;
+      color: var(--dim);
+      max-width: 760px;
+      line-height: 1.6;
+      text-align: justify;
+    }
+
+    footer .pg {
+      font-size: 11px;
+      color: var(--dim);
+      font-weight: 600;
+      white-space: nowrap;
+    }
+
+    /* ── 8. THIẾT LẬP KHI XUẤT PDF / IN ẤN ── */
+    @media print {
+      body.inline-editor-ready {
+        padding-top: 0 !important;
+      }
+      body {
+        background: #FFFFFF;
+        padding: 0;
+      }
+
+      .sheet {
+        border: none;
+        box-shadow: none;
+        page-break-after: always;
+        break-after: page;
+      }
+
+      .board-wrap {
+        overflow-x: visible;
+      }
+
+      table {
+        min-width: 100%;
+        table-layout: auto;
+      }
+    }
+  
+
+    /* ── CSS đặc thù riêng cho GA_v1.html ── */
+
+    /* Hero Section (Trang 1) */
+    .hero {
+      padding: calc(var(--gap-section, 24px) + 4px) var(--page-pad, 32px);
+      border-bottom: 1px solid var(--line);
+    }
+
+    h1 {
+      font-weight: 800;
+      font-size: var(--fs-h1, 28px);
+      line-height: 1.25;
+      margin-top: 8px;
+      color: var(--bsc-blue);
+      letter-spacing: -0.5px;
+    }
+
+    .lede {
+      margin-top: 12px;
+      font-size: var(--fs-body, 13.5px);
+      line-height: 1.75;
+      color: var(--dim);
+      max-width: none;
+      width: 100%;
+      text-align: justify;
+    }
+
+    .facts {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+      margin-top: 18px;
+      align-items: center;
+    }
+
+    .fact-chip {
+      font-size: var(--fs-label, 11.5px);
+      padding: 6px 14px;
+      border: 1px solid var(--line);
+      border-radius: 20px;
+      color: var(--dim);
+      background: var(--surface);
+    }
+
+    .fact-chip b {
+      color: var(--bsc-blue);
+    }
+
+    /* 4 khối chỉ số tổng hợp Hero-Stats */
+    .hero-stats {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 14px;
+      margin-top: 24px;
+    }
+
+    .hero-stat {
+      border: 1px solid var(--line);
+      border-radius: 10px;
+      padding: 14px 16px;
+      background: var(--surface);
+    }
+
+    .hero-stat.main {
+      background: var(--blue-tint);
+      border-color: var(--bsc-blue);
+    }
+
+    .hs-label {
+      font-size: 9.5px;
+      letter-spacing: .5px;
+      color: var(--dim);
+      font-weight: 700;
+      text-transform: uppercase;
+      line-height: 1.3;
+    }
+
+    .hs-value {
+      font-size: var(--fs-h2, 22px);
+      font-weight: 800;
+      margin-top: 6px;
+      line-height: 1.1;
+    }
+
+    .hs-value.green {
+      color: #22C55E;
+    }
+
+    .hs-value.red {
+      color: #EF4444;
+    }
+
+    .hs-value.plain {
+      color: var(--text);
+    }
+
+    .hs-sub {
+      font-size: 11px;
+      color: var(--dim);
+      margin-top: 6px;
+      font-weight: 600;
+    }
+
+    .hs-sub b {
+      color: var(--text);
+    }
+
+    /* ── Bảng Khuyến Nghị Đặc Thù ── */
+    .rec-table thead th:nth-child(1) {
+      width: 9%;
+    }
+
+    .rec-table thead th:nth-child(2) {
+      width: 17%;
+    }
+
+    .rec-table thead th:nth-child(3) {
+      width: 13%;
+    }
+
+    .rec-table thead th:nth-child(4) {
+      width: 12%;
+    }
+
+    .rec-table thead th:nth-child(5) {
+      width: 10%;
+    }
+
+    .rec-table thead th:nth-child(6) {
+      width: 17%;
+    }
+
+    .rec-table thead th:nth-child(7) {
+      width: 22%;
+    }
+
+    .rec-table td.sector {
+      color: var(--dim);
+      font-size: var(--fs-label, 11.5px);
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+    }
+
+    .rec-table td.price {
+      text-align: right;
+      font-variant-numeric: tabular-nums;
+    }
+
+    .weight-cell {
+      width: 104px;
+    }
+
+    .weight-inline {
+      display: flex;
+      align-items: center;
+      justify-content: flex-end;
+      gap: 10px;
+      width: 100%;
+    }
+
+    .weight-num {
+      min-width: 40px;
+      text-align: right;
+      font-weight: 700;
+      font-variant-numeric: tabular-nums;
+      font-size: var(--fs-body, 13px);
+      color: var(--bsc-teal);
+      line-height: 1;
+      display: flex;
+      align-items: center;
+      justify-content: flex-end;
+      margin: 0;
+      flex-shrink: 0;
+    }
+
+    .weight-bar-track {
+      height: 4px;
+      background: var(--line);
+      border-radius: 2px;
+      overflow: hidden;
+      flex: 1;
+      min-width: 110px;
+    }
+
+    .weight-bar-fill {
+      height: 100%;
+      background: var(--bsc-teal);
+      border-radius: 2px;
+    }
+
+    /* Line Chart (Trang 1) */
+    .chart-container {
+      padding: 0 var(--page-pad, 32px) var(--gap-section, 24px);
+    }
+
+    .chart-box {
+      border: 1px solid var(--line);
+      border-radius: 12px;
+      padding: 20px;
+      background: var(--surface);
+      position: relative;
+    }
+
+    .chart-legend-top {
+      display: flex;
+      gap: 20px;
+      font-size: 12px;
+      font-weight: 600;
+      margin-bottom: 16px;
+      justify-content: flex-end;
+    }
+
+    .legend-item {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    .legend-line {
+      width: 24px;
+      height: 3px;
+      border-radius: 2px;
+    }
+
+    svg {
+      display: block;
+      width: 100%;
+      height: auto;
+    }
+
+    /* Heatmap Matrix (Đầu Trang 2) */
+    .chart-block {
+      padding: 4px 32px 24px;
+      overflow-x: auto;
+      -webkit-overflow-scrolling: touch;
+    }
+
+    .heatmap-section {
+      padding-top: 18px;
+    }
+
+    .heatmap-section .chart-head {
+      margin-bottom: 10px;
+    }
+
+    .heatmap-table {
+      width: 100%;
+      min-width: 650px;
+      border-collapse: separate;
+      border-spacing: 4px;
+      font-size: var(--fs-label, 11.5px);
+    }
+
+    .heatmap-table th {
+      font-size: 10px;
+      letter-spacing: 0.4px;
+      color: var(--dim);
+      font-weight: 700;
+      text-transform: uppercase;
+      text-align: center;
+      padding-bottom: 4px;
+    }
+
+    .heatmap-table th.year-th {
+      text-align: left;
+      padding-left: 4px;
+    }
+
+    .heatmap-table td {
+      text-align: center;
+      padding: 11px 2px;
+      border-radius: 6px;
+      font-weight: 700;
+      font-variant-numeric: tabular-nums;
+    }
+
+    .heatmap-table td.year-cell {
+      text-align: left;
+      font-weight: 800;
+      padding-left: 6px;
+      background: none !important;
+      color: var(--text);
+      font-size: var(--fs-body, 13.5px);
+    }
+
+    .heatmap-table td.total-cell {
+      font-weight: 800;
+      background: var(--blue-tint) !important;
+      color: var(--bsc-blue) !important;
+      border: 1px solid var(--bsc-blue);
+    }
+
+    .heatmap-table td.empty-cell {
+      background: var(--surface) !important;
+      color: var(--dim);
+      font-weight: 400;
+    }
+
+    .heatmap-legend {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      margin-top: 14px;
+      font-size: 11px;
+      color: var(--dim);
+    }
+
+    .heatmap-legend .bar {
+      width: 140px;
+      height: 8px;
+      border-radius: 4px;
+      background: linear-gradient(to right, #EF4444, #FFFFFF, #22C55E);
+    }
+
+    /* Stock Detail Grid (Trang 2) */
+    .stock-grid {
+      display: grid;
+      grid-template-columns: repeat(6, minmax(0, 1fr));
+      gap: 12px;
+      padding: 0 var(--page-pad, 32px) var(--gap-section, 24px);
+      align-items: stretch;
+    }
+
+    .stock-card {
+      grid-column: span 2;
+      height: 264px;
+      border: 1px solid var(--line);
+      border-radius: 12px;
+      padding: 15px 16px;
+      background: var(--card);
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      min-width: 0;
+    }
+
+    .sc-head {
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-start;
+      gap: 10px;
+      min-height: 42px;
+    }
+
+    .sc-head .sc-ticker {
+      font-size: var(--fs-h4, 16px);
+      line-height: 1.3;
+      font-weight: 800;
+      color: var(--bsc-blue);
+    }
+
+    .sc-badge {
+      min-width: 54px;
+      text-align: center;
+      font-size: 14px;
+      line-height: 1;
+      font-weight: 800;
+      letter-spacing: 0;
+      padding: 7px 10px;
+      border-radius: 8px;
+      white-space: nowrap;
+      color: var(--bsc-blue);
+      background: var(--blue-tint);
+      border: 1px solid rgba(41, 92, 169, 0.25);
+    }
+
+    .sc-metrics {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 11px 12px;
+      margin-top: 13px;
+      padding-top: 13px;
+      border-top: 1px solid var(--line);
+    }
+
+    .sc-metrics .metric-item {
+      min-width: 0;
+    }
+
+    .sc-metrics .m-label {
+      font-size: 8.7px;
+      line-height: 1.3;
+      letter-spacing: 0.3px;
+      color: var(--dim);
+      font-weight: 700;
+      text-transform: uppercase;
+    }
+
+    .sc-metrics .m-value {
+      font-size: var(--fs-body, 13.5px);
+      font-weight: 800;
+      margin-top: 4px;
+      color: var(--text);
+      font-variant-numeric: tabular-nums;
+    }
+
+    .sc-action {
+      margin-top: 13px;
+      padding-top: 11px;
+      border-top: 1px dashed var(--line);
+      text-align: right;
+    }
+
+    .btn-link {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      background: var(--bsc-blue);
+      color: #FFFFFF;
+      text-decoration: none;
+      font-size: 11px;
+      font-weight: 700;
+      padding: 7px 12px;
+      border-radius: 6px;
+      transition: background 0.2s;
+    }
+
+    .btn-link:hover {
+      background: #1E427B;
+    }
+
+    /* Responsive đặc thù */
+    @media (max-width:768px) {
+      .hero-stats {
+        grid-template-columns: repeat(2, 1fr);
+      }
+
+      .stock-grid {
+        grid-template-columns: 1fr;
+      }
+
+      .stock-card {
+        grid-column: auto;
+        height: auto;
+        min-height: 264px;
+      }
+    }
+
+    @media (max-width:480px) {
+      .hero-stats {
+        grid-template-columns: 1fr;
+      }
+    }
+
+    @media print {
+      .chart-block {
+        overflow-x: visible;
+      }
+
+      .heatmap-table {
+        min-width: 100%;
+        table-layout: auto;
+      }
+
+      .btn-link {
+        border: 1px solid var(--bsc-blue);
+        color: var(--bsc-blue);
+        background: none;
+      }
+    }
+  
+
+
+
+/* Override riêng cho bản chụp ảnh Share */
+body {
+    zoom: 1.3;
+    padding: 0 !important;
+    background: #FFFFFF !important;
+}
+.doc {
+    max-width: 1000px !important;
+    box-shadow: none !important;
+    border: none !important;
+    padding: 24px 16px !important;
+    gap: 16px !important;
+}
+.sheet {
+    box-shadow: none !important;
+    border: none !important;
+    border-radius: 0 !important;
+}
+</style>
+</head>
+<body class="inline-editor-ready">
+<div class="doc">
+<div class="sheet">
+<div class="hero">
+  <div class="hero-tag" data-edit>DANH MỤC CHIẾN LƯỢC</div>
+  <h1 class="report-title" data-edit>Danh mục Đón sóng Nâng hạng Thị trường</h1>
+  <p class="lede" data-edit>Tập trung vào nhóm doanh nghiệp hưởng lợi trực tiếp khi thị trường chứng khoán Việt Nam được nâng hạng. Kết hợp góc nhìn cơ bản về câu chuyện nâng hạng với dự phóng của mô hình học máy định lượng dựa trên dữ liệu lịch sử. Ưu tiên thanh khoản cao và tối đa hóa lợi nhuận dựa trên chênh lệch giá.</p>
+  <div class="fact-chips">
+    <span class="fact-chip"><strong>Số lượng:</strong> 5 cổ phiếu</span>
+<span class="fact-chip"><strong>Thời gian nắm giữ:</strong> 1 quý</span>
+<span class="fact-chip"><strong>Kỳ cơ cấu:</strong> Hàng quý</span>
+
+  </div>
+  <div class="hero-stats">
+    
+    <div class="hero-stat positive">
+      <div class="hs-label">HIỆU SUẤT TỪ KHI THÀNH LẬP</div>
+      <div class="hs-value positive" data-edit>+69.5%</div>
+      <div class="hs-sub" data-edit>VN-Index +44.4%</div>
+    </div>
+    <div class="hero-stat negative">
+      <div class="hs-label">HIỆU SUẤT YTD</div>
+      <div class="hs-value negative" data-edit>-7.2%</div>
+      <div class="hs-sub" data-edit>VN-Index +3.7%</div>
+    </div>
+    <div class="hero-stat neutral">
+      <div class="hs-label">HỆ SỐ BETA</div>
+      <div class="hs-value neutral" data-edit>1.15</div>
+      <div class="hs-sub" data-edit>Tương quan thị trường</div>
+    </div>
+    <div class="hero-stat plain">
+      <div class="hs-label">NGÀY THÀNH LẬP</div>
+      <div class="hs-value plain" data-edit>29/03/2024</div>
+      <div class="hs-sub" data-edit></div>
+    </div>
+  </div>
+</div>
+
+<div class="sec-label">Hiệu quả hoạt động · theo ngày</div>
+<div class="chart-container">
+<div class="chart-box">
+<div class="chart-legend-top">
+<div class="legend-item"><span class="legend-line" style="background:var(--bsc-blue)"></span><span>Danh mục
+                Nâng hạng</span></div>
+<div class="legend-item"><span class="legend-line" style="background:#b6c2d0"></span><span>VN-Index</span>
+</div>
+</div>
+<div id="chart-daily"><svg viewBox="0 0 812 300" preserveAspectRatio="xMidYMid meet" role="img" aria-label="Hiệu quả danh mục so với VN-Index">
+        <defs>
+          <linearGradient id="fillT" x1="0" y1="0" x2="0" y2="1">
+            <stop offset="0%" stop-color="#1b4f9c" stop-opacity="0.10"></stop>
+            <stop offset="100%" stop-color="#1b4f9c" stop-opacity="0"></stop>
+          </linearGradient>
+        </defs>
+        <text x="32" y="261.6" text-anchor="end" font-size="10" fill="#98a6b5">80</text><text x="32" y="223.9" text-anchor="end" font-size="10" fill="#98a6b5">100</text><text x="32" y="186.2" text-anchor="end" font-size="10" fill="#98a6b5">120</text><text x="32" y="148.5" text-anchor="end" font-size="10" fill="#98a6b5">140</text><text x="32" y="110.8" text-anchor="end" font-size="10" fill="#98a6b5">160</text><text x="32" y="73.1" text-anchor="end" font-size="10" fill="#98a6b5">180</text><text x="32" y="35.4" text-anchor="end" font-size="10" fill="#98a6b5">200</text><text x="41.3" y="292" text-anchor="middle" font-size="10" fill="#98a6b5">Q2/2024</text><text x="120.7" y="292" text-anchor="middle" font-size="10" fill="#98a6b5">Q3/2024</text><text x="203.9" y="292" text-anchor="middle" font-size="10" fill="#98a6b5">Q4/2024</text><text x="289.8" y="292" text-anchor="middle" font-size="10" fill="#98a6b5">Q1/2025</text><text x="365.3" y="292" text-anchor="middle" font-size="10" fill="#98a6b5">Q2/2025</text><text x="444.6" y="292" text-anchor="middle" font-size="10" fill="#98a6b5">Q3/2025</text><text x="527.9" y="292" text-anchor="middle" font-size="10" fill="#98a6b5">Q4/2025</text><text x="613.8" y="292" text-anchor="middle" font-size="10" fill="#98a6b5">Q1/2026</text><text x="687.9" y="292" text-anchor="middle" font-size="10" fill="#98a6b5">Q2/2026</text>
+        <path d="M40.0 220.9 L41.3 219.2 L42.6 217.9 L43.9 223.1 L45.2 224.1 L46.5 228.8 L47.8 230.2 L49.1 225.6 L50.4 228.2 L51.7 227.2 L53.0 224.3 L54.3 235.8 L55.6 238.2 L56.9 245.1 L58.2 250.3 L59.5 244.7 L60.8 249.1 L62.1 240.3 L63.4 240.6 L64.7 241.9 L66.0 242.4 L67.3 242.0 L68.6 236.0 L69.9 235.9 L71.2 235.2 L72.5 237.1 L73.8 235.3 L75.1 235.4 L76.4 235.8 L77.7 232.6 L79.0 230.8 L80.3 229.8 L81.6 229.7 L82.9 228.4 L84.2 227.8 L85.5 227.4 L86.8 234.6 L88.1 234.8 L89.4 231.1 L90.7 232.2 L92.0 234.0 L93.3 233.8 L94.6 230.0 L95.9 229.4 L97.2 229.9 L98.5 230.9 L99.8 230.4 L101.2 228.9 L102.5 226.1 L103.8 221.4 L105.1 222.3 L106.4 226.5 L107.7 228.3 L109.0 228.7 L110.3 227.8 L111.6 229.0 L112.9 229.3 L114.2 234.9 L115.5 234.2 L116.8 234.3 L118.1 233.3 L119.4 233.3 L120.7 234.1 L122.0 232.2 L123.3 230.7 L124.6 229.3 L125.9 227.9 L127.2 228.4 L128.5 228.9 L129.8 230.2 L131.1 229.6 L132.4 231.4 L133.7 232.8 L135.0 232.1 L136.3 235.6 L137.6 236.6 L138.9 237.6 L140.2 239.0 L141.5 240.7 L142.8 238.8 L144.1 239.8 L145.4 239.5 L146.7 238.9 L148.0 239.7 L149.3 238.2 L150.6 242.7 L151.9 242.6 L153.2 247.7 L154.5 244.3 L155.8 242.9 L157.1 243.4 L158.4 239.9 L159.7 238.5 L161.0 238.2 L162.3 239.5 L163.6 240.4 L164.9 236.2 L166.2 235.6 L167.5 233.2 L168.8 229.2 L170.1 229.6 L171.4 230.3 L172.7 231.5 L174.0 232.6 L175.3 233.1 L176.6 233.3 L177.9 232.4 L179.2 232.3 L180.5 233.5 L181.8 233.6 L183.1 234.4 L184.4 235.4 L185.7 235.7 L187.0 235.9 L188.3 235.3 L189.6 236.2 L190.9 234.2 L192.2 233.1 L193.5 232.4 L194.8 233.0 L196.1 233.5 L197.4 232.5 L198.7 231.4 L200.0 230.6 L201.3 230.2 L202.6 230.2 L203.9 230.0 L205.2 229.7 L206.5 231.0 L207.8 231.2 L209.1 230.0 L210.4 230.1 L211.7 229.4 L213.0 227.3 L214.3 227.4 L215.6 228.3 L216.9 230.7 L218.2 231.5 L219.5 230.3 L220.8 230.1 L222.2 232.6 L223.5 235.5 L224.8 234.5 L226.1 236.6 L227.4 237.8 L228.7 237.1 L230.0 235.8 L231.3 235.2 L232.6 234.9 L233.9 237.0 L235.2 237.6 L236.5 237.6 L237.8 234.8 L239.1 235.3 L240.4 235.5 L241.7 237.0 L243.0 238.5 L244.3 239.8 L245.6 242.9 L246.9 245.3 L248.2 244.8 L249.5 247.5 L250.8 244.8 L252.1 243.0 L253.4 242.4 L254.7 241.9 L256.0 240.9 L257.3 240.4 L258.6 238.9 L259.9 236.6 L261.2 237.5 L262.5 237.0 L263.8 237.8 L265.1 232.8 L266.4 230.4 L267.7 230.6 L269.0 229.9 L270.3 229.1 L271.6 228.6 L272.9 226.7 L274.2 226.7 L275.5 228.0 L276.8 226.5 L278.1 228.0 L279.4 227.0 L280.7 226.5 L282.0 226.4 L283.3 224.5 L284.6 223.6 L285.9 224.1 L287.2 222.8 L288.5 222.8 L289.8 223.4 L291.1 226.9 L292.4 228.0 L293.7 227.5 L295.0 228.4 L296.3 228.5 L297.6 230.3 L298.9 229.4 L300.2 230.0 L301.5 229.7 L302.8 229.8 L304.1 229.4 L305.4 228.8 L306.7 230.3 L308.0 229.6 L309.3 227.0 L310.6 227.6 L311.9 231.5 L313.2 230.2 L314.5 229.9 L315.8 230.5 L317.1 231.0 L318.4 231.9 L319.7 231.3 L321.0 231.2 L322.3 232.4 L323.6 232.0 L324.9 232.9 L326.2 232.4 L327.5 231.5 L328.8 232.0 L330.1 232.3 L331.4 231.8 L332.7 232.3 L334.0 232.5 L335.3 232.8 L336.6 233.5 L337.9 232.4 L339.2 232.3 L340.5 233.6 L341.8 232.6 L343.2 232.5 L344.5 233.3 L345.8 234.7 L347.1 235.6 L348.4 236.5 L349.7 238.6 L351.0 238.2 L352.3 238.6 L353.6 241.1 L354.9 240.9 L356.2 240.4 L357.5 240.5 L358.8 241.5 L360.1 242.9 L361.4 242.0 L362.7 243.4 L364.0 243.4 L365.3 239.2 L366.6 238.4 L367.9 250.3 L369.2 244.6 L370.5 255.1 L371.8 255.9 L373.1 245.4 L374.4 236.1 L375.7 227.0 L377.0 223.4 L378.3 226.8 L379.6 221.1 L380.9 223.7 L382.2 227.1 L383.5 226.9 L384.8 227.7 L386.1 221.6 L387.4 215.1 L388.7 214.5 L390.0 215.5 L391.3 211.1 L392.6 211.6 L393.9 208.5 L395.2 201.8 L396.5 203.3 L397.8 199.3 L399.1 197.8 L400.4 198.0 L401.7 198.4 L403.0 195.5 L404.3 187.0 L405.6 178.8 L406.9 171.8 L408.2 174.8 L409.5 169.4 L410.8 162.1 L412.1 158.6 L413.4 159.1 L414.7 159.5 L416.0 160.6 L417.3 160.3 L418.6 159.3 L419.9 160.8 L421.2 161.7 L422.5 162.4 L423.8 176.2 L425.1 169.9 L426.4 169.3 L427.7 173.2 L429.0 178.8 L430.3 175.5 L431.6 172.8 L432.9 171.2 L434.2 169.4 L435.5 172.2 L436.8 163.4 L438.1 158.6 L439.4 159.3 L440.7 160.9 L442.0 161.4 L443.3 161.4 L444.6 164.0 L445.9 160.8 L447.2 161.6 L448.5 161.1 L449.8 158.3 L451.1 154.3 L452.4 150.7 L453.7 148.5 L455.0 148.3 L456.3 143.9 L457.6 143.3 L458.9 139.3 L460.2 130.4 L461.5 126.8 L462.8 134.6 L464.2 125.2 L465.5 127.3 L466.8 125.0 L468.1 117.0 L469.4 105.2 L470.7 121.8 L472.0 115.9 L473.3 113.4 L474.6 115.4 L475.9 105.6 L477.2 99.7 L478.5 95.2 L479.8 97.0 L481.1 93.5 L482.4 90.3 L483.7 93.5 L485.0 94.6 L486.3 89.5 L487.6 91.8 L488.9 94.8 L490.2 90.8 L491.5 89.9 L492.8 89.3 L494.1 103.7 L495.4 108.4 L496.7 91.1 L498.0 83.4 L499.3 80.1 L500.6 72.3 L501.9 66.9 L503.2 68.4 L504.5 82.1 L505.8 88.9 L507.1 82.8 L508.4 85.7 L509.7 81.5 L511.0 80.3 L512.3 77.3 L513.6 82.5 L514.9 87.4 L516.2 87.5 L517.5 91.5 L518.8 97.7 L520.1 96.3 L521.4 89.8 L522.7 90.6 L524.0 95.7 L525.3 96.5 L526.6 96.5 L527.9 96.9 L529.2 104.2 L530.5 102.5 L531.8 89.7 L533.1 90.4 L534.4 83.8 L535.7 73.6 L537.0 58.2 L538.3 49.8 L539.6 38.6 L540.9 37.2 L542.2 32.1 L543.5 50.8 L544.8 73.9 L546.1 69.8 L547.4 68.4 L548.7 66.0 L550.0 70.4 L551.3 88.5 L552.6 79.7 L553.9 87.4 L555.2 98.9 L556.5 115.6 L557.8 119.2 L559.1 106.6 L560.4 109.9 L561.7 111.8 L563.0 125.1 L564.3 137.5 L565.6 128.0 L566.9 114.6 L568.2 118.1 L569.5 115.5 L570.8 111.5 L572.1 108.1 L573.4 112.6 L574.7 107.7 L576.0 107.4 L577.3 98.0 L578.6 96.7 L579.9 90.0 L581.2 88.7 L582.5 85.5 L583.8 78.5 L585.2 76.6 L586.5 79.3 L587.8 80.9 L589.1 75.7 L590.4 70.6 L591.7 69.3 L593.0 86.3 L594.3 90.3 L595.6 106.6 L596.9 108.1 L598.2 100.1 L599.5 98.5 L600.8 97.9 L602.1 85.4 L603.4 66.6 L604.7 49.8 L606.0 42.9 L607.3 64.5 L608.6 71.4 L609.9 57.6 L611.2 55.6 L612.5 55.6 L613.8 64.9 L615.1 60.3 L616.4 54.2 L617.7 56.8 L619.0 53.4 L620.3 44.0 L621.6 33.7 L622.9 30.6 L624.2 37.8 L625.5 33.2 L626.8 30.1 L628.1 35.2 L629.4 39.1 L630.7 39.5 L632.0 42.1 L633.3 48.9 L634.6 44.2 L635.9 52.4 L637.2 54.7 L638.5 49.0 L639.8 46.6 L641.1 43.5 L642.4 42.7 L643.7 50.2 L645.0 58.3 L646.3 63.9 L647.6 74.4 L648.9 63.1 L650.2 65.8 L651.5 60.9 L652.8 44.9 L654.1 40.7 L655.4 46.2 L656.7 40.1 L658.0 37.4 L659.3 41.3 L660.6 47.3 L661.9 44.0 L663.2 52.5 L664.5 53.9 L665.8 69.2 L667.1 72.1 L668.4 60.3 L669.7 62.0 L671.0 68.0 L672.3 74.9 L673.6 75.8 L674.9 67.8 L676.2 71.6 L677.5 80.6 L678.8 95.1 L680.1 88.0 L681.4 80.0 L682.7 77.0 L684.0 70.4 L685.3 64.0 L686.6 64.0 L687.9 59.6 L689.2 63.4 L690.5 69.4 L691.8 69.1 L693.1 70.5 L694.4 58.2 L695.7 63.0 L697.0 60.0 L698.3 62.7 L699.6 63.6 L700.9 63.2 L702.2 65.9 L703.5 67.5 L704.8 63.5 L706.2 65.4 L707.5 67.2 L708.8 65.3 L710.1 71.4 L711.4 71.8 L712.7 72.0 L714.0 71.5 L715.3 69.6 L716.6 64.9 L717.9 62.5 L719.2 60.2 L720.5 62.3 L721.8 68.0 L723.1 68.4 L724.4 67.5 L725.7 70.9 L727.0 66.8 L728.3 66.4 L729.6 69.4 L730.9 71.3 L732.2 75.7 L733.5 74.4 L734.8 74.6 L736.1 72.6 L737.4 76.8 L738.7 80.6 L740.0 80.6 L741.3 84.0 L742.6 83.2 L743.9 81.8 L745.2 84.4 L746.5 89.2 L747.8 88.3 L749.1 87.5 L750.4 89.2 L751.7 89.7 L753.0 85.9 L754.3 84.0 L755.6 82.0 L756.9 84.2 L758.2 85.5 L759.5 87.3 L760.8 89.1 L762.1 89.1 L763.4 90.6 L764.7 91.6 L766.0 89.8 L 766.0 274.0 L 40.0 274.0 Z" fill="url(#fillT)"></path>
+        <path d="M40.0 220.9 L41.3 221.3 L42.6 220.5 L43.9 222.7 L45.2 223.2 L46.5 225.1 L47.8 225.8 L49.1 224.0 L50.4 224.6 L51.7 224.7 L53.0 222.0 L54.3 230.8 L55.6 230.9 L56.9 234.3 L58.2 236.9 L59.5 234.7 L60.8 236.6 L62.1 232.4 L63.4 232.5 L64.7 231.8 L66.0 230.8 L67.3 230.1 L68.6 227.1 L69.9 226.1 L71.2 225.8 L72.5 226.1 L73.8 226.7 L75.1 227.3 L76.4 226.9 L77.7 225.2 L79.0 223.1 L80.3 222.5 L81.6 221.8 L82.9 221.9 L84.2 223.4 L85.5 221.3 L86.8 224.1 L88.1 223.3 L89.4 221.2 L90.7 222.6 L92.0 223.5 L93.3 224.2 L94.6 221.5 L95.9 221.0 L97.2 220.8 L98.5 221.0 L99.8 220.4 L101.2 219.9 L102.5 220.8 L103.8 218.5 L105.1 218.3 L106.4 221.5 L107.7 222.3 L109.0 221.6 L110.3 221.5 L111.6 221.1 L112.9 221.2 L114.2 225.3 L115.5 224.9 L116.8 224.2 L118.1 224.6 L119.4 226.6 L120.7 225.2 L122.0 223.0 L123.3 221.9 L124.6 221.5 L125.9 221.0 L127.2 221.0 L128.5 219.5 L129.8 220.6 L131.1 220.9 L132.4 221.4 L133.7 221.5 L135.0 221.3 L136.3 223.1 L137.6 222.3 L138.9 223.7 L140.2 225.2 L141.5 228.6 L142.8 227.6 L144.1 228.4 L145.4 227.1 L146.7 226.4 L148.0 226.6 L149.3 225.7 L150.6 229.3 L151.9 227.9 L153.2 235.0 L154.5 231.7 L155.8 230.9 L157.1 232.0 L158.4 229.8 L159.7 228.8 L161.0 228.8 L162.3 228.8 L163.6 229.8 L164.9 225.6 L166.2 224.2 L167.5 222.6 L168.8 220.9 L170.1 221.1 L171.4 220.7 L172.7 221.5 L174.0 221.4 L175.3 221.3 L176.6 221.3 L177.9 220.9 L179.2 222.1 L180.5 223.2 L181.8 222.4 L183.1 223.3 L184.4 225.1 L185.7 225.4 L187.0 225.0 L188.3 225.6 L189.6 227.5 L190.9 224.6 L192.2 223.7 L193.5 222.8 L194.8 222.7 L196.1 223.2 L197.4 221.9 L198.7 220.4 L200.0 219.8 L201.3 219.9 L202.6 220.3 L203.9 219.7 L205.2 220.3 L206.5 221.8 L207.8 222.9 L209.1 223.0 L210.4 222.7 L211.7 221.2 L213.0 220.5 L214.3 220.3 L215.6 220.5 L216.9 221.3 L218.2 221.6 L219.5 220.5 L220.8 220.7 L222.2 221.5 L223.5 223.0 L224.8 222.8 L226.1 224.8 L227.4 225.5 L228.7 225.2 L230.0 224.2 L231.3 224.6 L232.6 223.8 L233.9 225.2 L235.2 226.7 L236.5 226.5 L237.8 224.2 L239.1 224.5 L240.4 225.5 L241.7 225.8 L243.0 226.7 L244.3 226.5 L245.6 228.6 L246.9 230.5 L248.2 230.7 L249.5 232.5 L250.8 230.8 L252.1 229.1 L253.4 229.1 L254.7 228.1 L256.0 227.1 L257.3 227.1 L258.6 227.1 L259.9 225.8 L261.2 225.7 L262.5 225.9 L263.8 227.3 L265.1 223.3 L266.4 222.9 L267.7 222.4 L269.0 222.7 L270.3 223.1 L271.6 223.3 L272.9 224.1 L274.2 223.9 L275.5 224.2 L276.8 223.5 L278.1 225.2 L279.4 224.8 L280.7 224.0 L282.0 224.4 L283.3 222.4 L284.6 222.5 L285.9 222.2 L287.2 222.7 L288.5 223.4 L289.8 223.0 L291.1 225.2 L292.4 226.4 L293.7 226.3 L295.0 225.7 L296.3 226.5 L297.6 228.7 L298.9 228.0 L300.2 229.0 L301.5 227.9 L302.8 227.0 L304.1 226.0 L305.4 226.0 L306.7 226.5 L308.0 227.0 L309.3 224.5 L310.6 223.7 L311.9 225.4 L313.2 223.7 L314.5 223.0 L315.8 222.7 L317.1 222.2 L318.4 223.9 L319.7 223.2 L321.0 223.4 L322.3 222.9 L323.6 222.1 L324.9 222.6 L326.2 221.8 L327.5 220.2 L328.8 219.6 L330.1 219.0 L331.4 217.9 L332.7 218.1 L334.0 218.1 L335.3 217.4 L336.6 217.8 L337.9 217.2 L339.2 216.8 L340.5 217.9 L341.8 215.9 L343.2 214.7 L344.5 214.1 L345.8 213.8 L347.1 213.5 L348.4 214.7 L349.7 214.7 L351.0 213.2 L352.3 214.0 L353.6 214.9 L354.9 215.0 L356.2 215.3 L357.5 214.1 L358.8 213.9 L360.1 214.7 L361.4 215.1 L362.7 216.0 L364.0 217.5 L365.3 216.0 L366.6 215.9 L367.9 228.8 L369.2 231.7 L370.5 243.1 L371.8 248.7 L373.1 237.9 L374.4 229.9 L375.7 227.1 L377.0 229.1 L378.3 231.7 L379.6 230.7 L380.9 230.4 L382.2 232.2 L383.5 233.6 L384.8 231.6 L386.1 229.8 L387.4 228.9 L388.7 229.3 L390.0 229.4 L391.3 227.4 L392.6 227.1 L393.9 225.8 L395.2 223.0 L396.5 223.4 L397.8 221.0 L399.1 219.5 L400.4 217.1 L401.7 216.6 L403.0 218.3 L404.3 219.1 L405.6 216.3 L406.9 215.2 L408.2 216.5 L409.5 216.4 L410.8 213.8 L412.1 212.7 L413.4 212.4 L414.7 212.4 L416.0 213.8 L417.3 213.2 L418.6 211.6 L419.9 211.8 L421.2 212.4 L422.5 214.2 L423.8 217.0 L425.1 216.2 L426.4 216.3 L427.7 215.2 L429.0 216.3 L430.3 212.9 L431.6 211.6 L432.9 211.7 L434.2 210.9 L435.5 211.3 L436.8 210.0 L438.1 208.7 L439.4 208.7 L440.7 208.9 L442.0 208.1 L443.3 207.4 L444.6 207.1 L445.9 206.1 L447.2 206.5 L448.5 205.8 L449.8 203.6 L451.1 201.6 L452.4 199.3 L453.7 197.2 L455.0 195.4 L456.3 193.5 L457.6 195.0 L458.9 192.8 L460.2 190.6 L461.5 189.6 L462.8 191.4 L464.2 187.8 L465.5 187.4 L466.8 186.1 L468.1 184.6 L469.4 180.8 L470.7 190.2 L472.0 188.1 L473.3 188.8 L474.6 189.9 L475.9 185.0 L477.2 182.3 L478.5 178.4 L479.8 177.2 L481.1 176.7 L482.4 175.0 L483.7 173.3 L485.0 172.8 L486.3 168.5 L487.6 170.1 L488.9 169.2 L490.2 166.6 L491.5 165.1 L492.8 161.6 L494.1 167.8 L495.4 172.5 L496.7 164.6 L498.0 163.8 L499.3 162.6 L500.6 162.4 L501.9 162.6 L503.2 160.4 L504.5 164.7 L505.8 170.9 L507.1 169.0 L508.4 168.2 L509.7 166.0 L511.0 164.6 L512.3 162.0 L513.6 162.6 L514.9 164.1 L516.2 164.9 L517.5 165.9 L518.8 169.5 L520.1 169.3 L521.4 166.1 L522.7 164.8 L524.0 165.6 L525.3 164.7 L526.6 165.4 L527.9 165.0 L529.2 166.8 L530.5 167.8 L531.8 160.5 L533.1 162.0 L534.4 160.1 L535.7 157.4 L537.0 152.9 L538.3 150.3 L539.6 150.9 L540.9 151.3 L542.2 150.0 L543.5 155.2 L544.8 169.2 L546.1 165.2 L547.4 163.0 L548.7 161.7 L550.0 162.3 L551.3 166.8 L552.6 162.7 L553.9 161.9 L555.2 164.3 L556.5 168.7 L557.8 172.0 L559.1 166.9 L560.4 166.4 L561.7 168.3 L563.0 174.6 L564.3 177.4 L565.6 175.5 L566.9 169.8 L568.2 169.9 L569.5 169.3 L570.8 166.5 L572.1 165.7 L573.4 167.3 L574.7 166.3 L576.0 166.4 L577.3 164.5 L578.6 165.7 L579.9 162.7 L581.2 162.1 L582.5 161.1 L583.8 159.6 L585.2 157.3 L586.5 155.2 L587.8 154.4 L589.1 153.8 L590.4 151.9 L591.7 152.9 L593.0 157.0 L594.3 160.0 L595.6 167.6 L596.9 167.8 L598.2 162.9 L599.5 163.7 L600.8 163.2 L602.1 159.2 L603.4 152.3 L604.7 149.2 L606.0 147.7 L607.3 153.5 L608.6 155.5 L609.9 151.8 L611.2 150.0 L612.5 147.4 L613.8 146.9 L615.1 142.8 L616.4 136.1 L617.7 137.0 L619.0 135.2 L620.3 133.8 L621.6 130.0 L622.9 131.3 L624.2 135.6 L625.5 133.5 L626.8 131.0 L628.1 131.4 L629.4 132.6 L630.7 133.0 L632.0 134.8 L633.3 138.7 L634.6 140.7 L635.9 144.7 L637.2 143.0 L638.5 140.9 L639.8 144.2 L641.1 143.2 L642.4 146.4 L643.7 147.7 L645.0 151.7 L646.3 151.8 L647.6 151.9 L648.9 145.6 L650.2 143.1 L651.5 141.6 L652.8 136.3 L654.1 135.2 L655.4 136.2 L656.7 133.5 L658.0 133.4 L659.3 138.4 L660.6 143.2 L661.9 142.5 L663.2 143.9 L664.5 149.9 L665.8 166.8 L667.1 163.2 L668.4 155.7 L669.7 158.4 L671.0 160.4 L672.3 160.8 L673.6 158.3 L674.9 157.8 L676.2 160.0 L677.5 167.5 L678.8 175.8 L680.1 172.3 L681.4 166.0 L682.7 168.0 L684.0 163.8 L685.3 165.3 L686.6 163.6 L687.9 159.4 L689.2 160.6 L690.5 162.2 L691.8 163.5 L693.1 163.1 L694.4 151.5 L695.7 154.4 L697.0 152.5 L698.3 151.2 L699.6 148.7 L700.9 145.0 L702.2 142.2 L703.5 142.6 L704.8 139.7 L706.2 140.2 L707.5 136.7 L708.8 134.8 L710.1 137.3 L711.4 134.0 L712.7 137.2 L714.0 137.2 L715.3 134.1 L716.6 131.8 L717.9 129.1 L719.2 128.2 L720.5 131.1 L721.8 130.3 L723.1 130.7 L724.4 126.7 L725.7 127.3 L727.0 126.4 L728.3 128.6 L729.6 128.5 L730.9 130.9 L732.2 133.8 L733.5 132.5 L734.8 132.8 L736.1 134.2 L737.4 135.8 L738.7 135.8 L740.0 138.6 L741.3 141.3 L742.6 142.3 L743.9 140.5 L745.2 139.4 L746.5 146.5 L747.8 146.2 L749.1 144.6 L750.4 145.3 L751.7 146.4 L753.0 145.3 L754.3 144.0 L755.6 144.2 L756.9 140.7 L758.2 141.5 L759.5 136.6 L760.8 135.0 L762.1 133.7 L763.4 135.9 L764.7 134.6 L766.0 137.1" fill="none" stroke="#b6c2d0" stroke-width="1.6"></path>
+        <circle cx="766.0" cy="89.8" r="3" fill="#1b4f9c"></circle>
+        <circle cx="766.0" cy="137.1" r="3" fill="#b6c2d0"></circle>
+        <text x="772.0" y="93.8" font-size="12" font-weight="700" fill="#1b4f9c">170</text>
+        <text x="772.0" y="141.1" font-size="12" fill="#98a6b5">144</text>
+      </svg></div>
+</div>
+</div>
+
+<div class="sec-label" style="padding: 0 32px 12px !important;">CHI TIẾT MÃ CỔ PHIẾU</div>
+<div class="stock-grid" style="grid-template-columns: repeat(2, minmax(0, 1fr));">
+<div class="stock-card">
+<div class="sc-card-main">
+<div class="sc-head">
+<div class="sc-identity"><div class="sc-ticker">SAB</div><div class="sc-sector">Thực phẩm & Đồ uống</div></div>
+<span class="sc-badge"><span class="sc-badge-label">Tỷ trọng danh mục</span><span class="sc-badge-value">30%%</span></span>
+</div>
+<div class="sc-metrics">
+<div class="metric-item">
+<div class="m-label">Vốn hóa<br></div>
+<div class="m-value">59K tỷ</div>
+</div>
+<div class="metric-item">
+<div class="m-label">Thanh khoản<br></div>
+<div class="m-value">26 tỷ</div>
+</div>
+<div class="metric-item">
+<div class="m-label">Free float</div>
+<div class="m-value">11%</div>
+</div>
+<div class="metric-item">
+<div class="m-label">Tăng trưởng <br>LNST svck</div>
+<div class="m-value">49%</div>
+</div>
+<div class="metric-item">
+<div class="m-label">P/E ttm</div>
+<div class="m-value">12.4x</div>
+</div>
+<div class="metric-item">
+<div class="m-label">P/B ttm</div>
+<div class="m-value">2.7x</div>
+</div>
+</div>
+</div>
+<div class="sc-action">
+<a class="btn-link" href="#">Xem báo cáo phân tích chi tiết</a>
+</div>
+</div>
+<div class="stock-card">
+<div class="sc-card-main">
+<div class="sc-head">
+<div class="sc-identity"><div class="sc-ticker">VIC</div><div class="sc-sector">Bất động sản</div></div>
+<span class="sc-badge"><span class="sc-badge-label">Tỷ trọng danh mục</span><span class="sc-badge-value">25%%</span></span>
+</div>
+<div class="sc-metrics">
+<div class="metric-item">
+<div class="m-label">Vốn hóa<br></div>
+<div class="m-value">1,731K tỷ</div>
+</div>
+<div class="metric-item">
+<div class="m-label">Thanh khoản<br></div>
+<div class="m-value">1,292 tỷ</div>
+</div>
+<div class="metric-item">
+<div class="m-label">Free float</div>
+<div class="m-value">35%</div>
+</div>
+<div class="metric-item">
+<div class="m-label">Tăng trưởng <br>LNST svck</div>
+<div class="m-value">4%</div>
+</div>
+<div class="metric-item">
+<div class="m-label">P/E ttm</div>
+<div class="m-value">148.1x</div>
+</div>
+<div class="metric-item">
+<div class="m-label">P/B ttm</div>
+<div class="m-value">11.7x</div>
+</div>
+</div>
+</div>
+<div class="sc-action">
+<a class="btn-link" href="#">Xem báo cáo phân tích chi tiết</a>
+</div>
+</div>
+
+</div>
+
+<footer style="margin: 24px 32px 32px; display: flex; justify-content: space-between; align-items: center; border-top: 1px solid var(--line); padding-top: 24px;">
+    <div class="disclaimer-block">
+        <div class="cta-title" style="font-size: 14px; font-weight: 800; color: var(--bsc-blue); margin-bottom: 6px; text-transform: uppercase;">KHUYẾN CÁO SỬ DỤNG</div>
+        <p class="disclaimer-text" style="font-size: 12px; color: var(--dim); max-width: 600px; line-height: 1.5; text-align: justify;">Tài liệu chỉ mang tính chất tham khảo. Vui lòng đọc kỹ Báo cáo chi tiết để biết rủi ro.</p>
+    </div>
+    <div class="qr-block" style="display: flex; align-items: center; gap: 16px;">
+        <div class="qr-svg-wrap" style="width: 72px; height: 72px;">
+            #document
+        </div>
+        <div class="qr-text" style="font-size: 14px; font-weight: 700; color: var(--dim);">
+            Quét mã để xem<br><span style="color: var(--bsc-blue);">Báo cáo chi tiết</span>
+        </div>
+    </div>
+</footer>
+
+</div>
+</div>
+</body>
+</html>

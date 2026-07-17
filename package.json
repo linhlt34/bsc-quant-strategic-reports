@@ -1,0 +1,15 @@
+{
+  "name": "bsc-quant-research",
+  "version": "2.0.0",
+  "description": "BSC Quant Research — Config-driven 3-target report system",
+  "private": true,
+  "scripts": {
+    "build":   "powershell -ExecutionPolicy Bypass -File build.ps1",
+    "export":  "powershell -ExecutionPolicy Bypass -File export.ps1",
+    "dev":     "powershell -ExecutionPolicy Bypass -File build.ps1 && start dist/index-web.html",
+    "preview": "start dist/index-web.html"
+  },
+  "engines": {
+    "node": ">=18.0.0"
+  }
+}
