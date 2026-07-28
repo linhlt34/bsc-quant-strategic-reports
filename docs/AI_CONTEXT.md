@@ -1,141 +1,63 @@
-﻿# AI Context Guide
+# AI Context
 
-Read this before modifying the repository.
+## Project Summary
 
-## Project Identity
+This repository builds static BSC Quant/Strategic Research reports. Preserve the institutional report format unless the user explicitly asks for a redesign. Web, Print/PDF, and Share-card outputs must stay visually consistent.
 
-This is a BSC Quant/Strategic Research static report generator. The output is an institutional financial report with strict visual expectations. It is not a marketing site and not a generic web app.
+## Source Of Truth
 
-## Active Branch State
+- Report content: `data/report-data.json`
+- Theme/global tokens: `config/theme.json`
+- Data-source registry: `config/data-sources.json`
+- Python package: `src/bsc_quant_research/`
+- Report assets: `src/report_assets/`
+- Generated output: `dist/`
 
-The active development branch is `LL`. It has merged `gianganh-intheflow-patch-1`, so the main architecture is now the Python modular renderer.
-
-Branch meanings:
-
-- `main`: clean baseline branch.
-- `LL`: active development branch.
-- `gianganh-intheflow-patch-1`: merged source branch that introduced the Python pipeline.
+Do not treat `dist/` as source. Update source files and rebuild.
 
 ## Architecture
 
-Primary build:
-
-```text
-app/build.py
-```
-
-Windows wrapper:
-
-```text
-build.ps1
-```
-
-Export:
-
-```text
-export.ps1
-```
-
-Key source directories:
-
-```text
-app/providers/
-app/report/
-config/
-data/
-src/partials/
-src/templates/
-src/styles/
-src/scripts/
-```
-
-Generated directories/files:
-
-```text
-data/generated/
-dist/
-```
-
-Do not treat `dist/` as source.
-
-## Critical Requirements
-
-Preserve:
-
-- BSC institutional report style.
-- Vietnamese text correctness.
-- table/chart/heatmap/card readability.
-- PDF page fit.
-- share image output at `1200x1500`.
-- separation between data providers and renderer.
-
-Renderer must not call databases/MCP directly. External data should enter through providers/overlays.
-
-## Build Flow
-
 ```text
 config/data-sources.json
-  -> app.providers.resolve_report_data
+  -> src/bsc_quant_research/providers/
   -> data/generated/report-data.json
-  -> app.report.validate.validate_report
-  -> app.report.render.render_project
-  -> dist/*.html
-  -> export.ps1 for PDF/PNG
+  -> src/bsc_quant_research/report/
+  -> src/report_assets/
+  -> dist/
 ```
 
-Default data source is `data/report-data.json`.
+Important modules:
 
-## Commands
+- `src/bsc_quant_research/build.py`: build orchestration.
+- `src/bsc_quant_research/providers/merge.py`: deep merge behavior, including ticker-based list merge.
+- `src/bsc_quant_research/report/validate.py`: required data checks.
+- `src/bsc_quant_research/report/render.py`: HTML assembly and output writes.
+- `src/report_assets/styles/`: report, print, share, editor styling.
 
-Build:
+## Commands To Verify Work
 
 ```powershell
-powershell -ExecutionPolicy Bypass -File build.ps1
+python -m pytest
+python src/bsc_quant_research/build.py
+powershell -ExecutionPolicy Bypass -File scripts/export.ps1
 ```
 
-or:
+Scans:
 
 ```powershell
-python app/build.py
-```
-
-Export:
-
-```powershell
-powershell -ExecutionPolicy Bypass -File export.ps1
-```
-
-Verification:
-
-```powershell
+rg "<<<<<<<|=======|>>>>>>>"
 rg "##[A-Z_]+##|\{\{[^}]+\}\}" dist
 rg "Ã|Ä|Æ|á»|áº|�" data src dist
 ```
 
-## Editing Rules
+## Style Constraints
 
-Prefer source edits in:
+- Preserve tables, charts, typography, and text colors from the approved report style unless explicitly requested.
+- Prefer global setup changes in `config/theme.json` and shared CSS before component-specific overrides.
+- Keep generated output reproducible.
+- Avoid broad refactors while making content/style fixes.
+- Keep Vietnamese text UTF-8 clean.
 
-- `data/report-data.json`
-- `theme.config.json`
-- `app/`
-- `src/`
-- `config/`
+## Current Branch Context
 
-Avoid:
-
-- editing generated `dist` files as the only fix.
-- committing `__pycache__`, `.pyc`, temp files, or local browser state.
-- deleting user changes.
-- using destructive Git commands unless explicitly requested.
-- silently switching back to the old PowerShell-only pipeline.
-
-## Visual Context
-
-The project previously used a PowerShell string-replacement pipeline and had an approved visual reference file. After merge, styling is now mainly in `src/styles/report.css`, `src/styles/print.css`, and `src/styles/share.css`.
-
-When asked to keep format, inspect current CSS/templates and preserve the institutional visual character. Prefer token/global changes for spacing and type changes.
-
-## Git Notes
-
-If a merge is in progress, inspect conflicts before resolving. For the merge from `gianganh-intheflow-patch-1` into `LL`, prefer the Python/source architecture and do not keep Python cache artifacts.
+Use branch `LL` for continuing development. It already merged the cleaned `main` state and the flattened `gianganh-intheflow-patch-1` pipeline.

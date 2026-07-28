@@ -1,6 +1,7 @@
 # BSC Quant Research - Windows export entry point
 $ErrorActionPreference = "Stop"
-$projectRoot = Split-Path -Parent $MyInvocation.MyCommand.Path
+$scriptDir = Split-Path -Parent $MyInvocation.MyCommand.Path
+$projectRoot = Split-Path -Parent $scriptDir
 Set-Location $projectRoot
 
 $programFilesX86 = [Environment]::GetEnvironmentVariable("ProgramFiles(x86)")
@@ -19,13 +20,13 @@ $edgePath = $edgeCandidates[0]
 
 $dataFile = "data/generated/report-data.json"
 if (-not (Test-Path $dataFile)) {
-  throw "Missing data/generated/report-data.json. Run build.ps1 before export.ps1."
+  throw "Missing data/generated/report-data.json. Run scripts/build.ps1 before scripts/export.ps1."
 }
 $data = Get-Content $dataFile -Raw -Encoding UTF8 | ConvertFrom-Json
 $docCode = $data.meta.docCode
 $destDir = Join-Path $projectRoot "dist/$docCode"
 if (-not (Test-Path $destDir)) {
-  throw "Missing dist/$docCode. Run build.ps1 before export.ps1."
+  throw "Missing dist/$docCode. Run scripts/build.ps1 before scripts/export.ps1."
 }
 
 $tempDir = Join-Path $env:TEMP "bsc-quant-export"

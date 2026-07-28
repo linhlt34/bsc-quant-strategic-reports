@@ -1,4 +1,5 @@
-# Tài liệu tham chiếu giao diện
+# References
 
-GA_v9 chỉ được dùng làm chuẩn đối chiếu thị giác. Project không import, include hoặc dùng GA_v9 làm template nguồn.
-Giao diện v9 đã được viết lại trực tiếp trong `src/styles/report.css` và các partial hiện hữu.
+Use this folder for approved visual references, source screenshots, or design notes that should inform future report changes.
+
+The active implementation lives in `src/report_assets/` and `src/bsc_quant_research/`. Keep durable style changes in source files and rebuild generated output in `dist/`.

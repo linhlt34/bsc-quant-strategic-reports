@@ -123,10 +123,10 @@ def _render_share_cards(cards: list[dict[str, Any]], template: str) -> str:
             "{{ ticker }}": escape(card.get("ticker")),
             "{{ sector }}": escape(card.get("company") or card.get("sector")),
             "{{ weight }}": escape(card.get("weight")),
-            "{{ mcap }}": escape(metric("VỐN HÓA")),
-            "{{ liq }}": escape(metric("THANH KHOẢN")),
+            "{{ mcap }}": escape(metric("V\u1ed0N H\u00d3A")),
+            "{{ liq }}": escape(metric("THANH KHO\u1ea2N")),
             "{{ float }}": escape(metric("FREE FLOAT").replace("%", "")),
-            "{{ growth }}": escape(metric("TĂNG TRƯỞNG").replace("%", "")),
+            "{{ growth }}": escape(metric("T\u0102NG TR\u01af\u1edeNG").replace("%", "")),
             "{{ pe }}": escape(metric("P/E").replace("x", "")),
             "{{ pb }}": escape(metric("P/B").replace("x", "")),
         }
@@ -135,12 +135,12 @@ def _render_share_cards(cards: list[dict[str, Any]], template: str) -> str:
 
 
 def render_project(project_root: Path, data: dict[str, Any], theme: dict[str, Any]) -> list[Path]:
-    src = project_root / "src"
-    partial_dir = src / "partials"
-    template_dir = src / "templates"
-    style_dir = src / "styles"
+    asset_root = project_root / "src" / "report_assets"
+    partial_dir = asset_root / "partials"
+    template_dir = asset_root / "templates"
+    style_dir = asset_root / "styles"
 
-    logo_uri = data_uri(project_root / "assets/img/logo.svg")
+    logo_uri = data_uri(asset_root / "images/logo.svg")
     row_template = read_text(partial_dir / "rec-table-row.html")
     stock_template = read_text(partial_dir / "stock-card-item.html")
     share_card_template = read_text(partial_dir / "share-stock-card-item.html")
@@ -190,7 +190,7 @@ def render_project(project_root: Path, data: dict[str, Any], theme: dict[str, An
     ])
     print_css = read_text(style_dir / "print.css")
     editor_css = read_text(style_dir / "editor.css")
-    editor_js = read_text(src / "scripts/editor.js").replace("##DOC_CODE##", json.dumps(str(data["meta"]["docCode"])))
+    editor_js = read_text(asset_root / "scripts/editor.js").replace("##DOC_CODE##", json.dumps(str(data["meta"]["docCode"])))
     toolbar = read_text(partial_dir / "editor-toolbar.html")
 
     report_template = read_text(template_dir / "report.html")
