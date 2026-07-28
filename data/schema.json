@@ -1,226 +1,40 @@
 {
-  "$schema": "http://json-schema.org/draft-07/schema#",
-  "title": "BSC Quant Report Schema",
-  "type": "OBJECT",
-  "required": ["meta", "topbar", "hero", "recTable", "chart", "heatmap", "stockCards", "contacts", "legalText", "copyrightYear", "shareCard"],
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://bsc.com.vn/schemas/quant-report.schema.json",
+  "title": "BSC Quant Strategic Report",
+  "type": "object",
+  "required": ["meta", "topbar", "hero", "recTable", "chart", "heatmap", "stockCards"],
   "properties": {
     "meta": {
-      "type": "OBJECT",
-      "required": ["docCode", "reportTitle", "reportSubtitle", "division", "issueDate", "period", "nextReview", "pageCount", "disclaimer"],
+      "type": "object",
+      "required": ["docCode", "reportTitle", "pageCount"],
       "properties": {
-        "docCode": {
-          "type": "STRING",
-          "pattern": "^BSC-QUANT-\\d{4}-\\d{2}$"
-        },
-        "reportTitle": { "type": "STRING" },
-        "reportSubtitle": { "type": "STRING" },
-        "division": { "type": "STRING" },
-        "issueDate": { "type": "STRING" },
-        "period": { "type": "STRING" },
-        "nextReview": { "type": "STRING" },
-        "pageCount": { "type": "INTEGER" },
-        "disclaimer": { "type": "STRING" }
-      }
-    },
-    "topbar": {
-      "type": "OBJECT",
-      "required": ["brandLabel", "divisionLabel", "metaLine1", "metaLine2"],
-      "properties": {
-        "brandLabel": { "type": "STRING" },
-        "divisionLabel": { "type": "STRING" },
-        "metaLine1": { "type": "STRING" },
-        "metaLine2": { "type": "STRING" }
-      }
-    },
-    "hero": {
-      "type": "OBJECT",
-      "required": ["tag", "title", "lede", "factChips", "heroStats"],
-      "properties": {
-        "tag": { "type": "STRING" },
-        "title": { "type": "STRING" },
-        "lede": { "type": "STRING" },
-        "factChips": {
-          "type": "ARRAY",
-          "items": {
-            "type": "OBJECT",
-            "required": ["label", "value"],
-            "properties": {
-              "label": { "type": "STRING" },
-              "value": { "type": "STRING" }
-            }
-          }
-        },
-        "heroStats": {
-          "type": "ARRAY",
-          "items": {
-            "type": "OBJECT",
-            "required": ["label", "value", "unit", "sub", "style"],
-            "properties": {
-              "label": { "type": "STRING" },
-              "value": { "type": "STRING" },
-              "unit": { "type": "STRING" },
-              "sub": { "type": "STRING" },
-              "style": { "type": "STRING", "enum": ["main", "positive", "neutral", "plain"] }
-            }
-          }
-        }
+        "docCode": { "type": "string", "pattern": "^BSC-QUANT-[0-9]{4}-[0-9]{2}$" },
+        "reportTitle": { "type": "string", "minLength": 1 },
+        "pageCount": { "type": "integer", "minimum": 1 }
       }
     },
     "recTable": {
-      "type": "OBJECT",
-      "required": ["sectionLabel", "sectionSub", "columns", "rows", "footerRow"],
+      "type": "object",
+      "required": ["rows"],
       "properties": {
-        "sectionLabel": { "type": "STRING" },
-        "sectionSub": { "type": "STRING" },
-        "columns": {
-          "type": "ARRAY",
-          "items": { "type": "STRING" }
-        },
         "rows": {
-          "type": "ARRAY",
+          "type": "array",
+          "minItems": 1,
           "items": {
-            "type": "OBJECT",
+            "type": "object",
             "required": ["ticker", "sector", "buyPrice", "peTtm", "pbTtm", "profitGrowth", "weight"],
             "properties": {
-              "ticker": { "type": "STRING" },
-              "sector": { "type": "STRING" },
-              "buyPrice": { "type": "STRING" },
-              "peTtm": { "type": "STRING" },
-              "pbTtm": { "type": "STRING" },
-              "profitGrowth": { "type": "STRING" },
-              "weight": { "type": "INTEGER", "minimum": 0, "maximum": 100 }
-            }
-          }
-        },
-        "footerRow": {
-          "type": "OBJECT",
-          "required": ["label", "targetReturn", "totalWeight"],
-          "properties": {
-            "label": { "type": "STRING" },
-            "targetReturn": { "type": "STRING" },
-            "totalWeight": { "type": "STRING" }
-          }
-        }
-      }
-    },
-    "chart": {
-      "type": "OBJECT",
-      "required": ["sectionLabel", "title", "legend", "data", "annotations"],
-      "properties": {
-        "sectionLabel": { "type": "STRING" },
-        "title": { "type": "STRING" },
-        "legend": {
-          "type": "ARRAY",
-          "items": {
-            "type": "OBJECT",
-            "required": ["label", "color"],
-            "properties": {
-              "label": { "type": "STRING" },
-              "color": { "type": "STRING" }
-            }
-          }
-        },
-        "data": {
-          "type": "OBJECT",
-          "required": ["labels", "portfolio", "vnindex"],
-          "properties": {
-            "labels": { "type": "ARRAY", "items": { "type": "STRING" } },
-            "portfolio": { "type": "ARRAY", "items": { "type": "NUMBER" } },
-            "vnindex": { "type": "ARRAY", "items": { "type": "NUMBER" } }
-          }
-        },
-        "annotations": {
-          "type": "OBJECT",
-          "required": ["portfolioReturn", "vnindexReturn", "alpha"],
-          "properties": {
-            "portfolioReturn": { "type": "STRING" },
-            "vnindexReturn": { "type": "STRING" },
-            "alpha": { "type": "STRING" }
-          }
-        }
-      }
-    },
-    "heatmap": {
-      "type": "OBJECT",
-      "required": ["sectionLabel", "sectionSub", "months", "rows"],
-      "properties": {
-        "sectionLabel": { "type": "STRING" },
-        "sectionSub": { "type": "STRING" },
-        "months": { "type": "ARRAY", "items": { "type": "STRING" } },
-        "rows": {
-          "type": "ARRAY",
-          "items": {
-            "type": "OBJECT",
-            "required": ["year", "data", "style"],
-            "properties": {
-              "year": { "type": "INTEGER" },
-              "data": { "type": "ARRAY", "items": { "type": ["NUMBER", "NULL"] } },
-              "style": { "type": "STRING", "enum": ["positive", "negative", "current"] }
+              "ticker": { "type": "string", "minLength": 1 },
+              "weight": { "type": "number", "minimum": 0, "maximum": 100 }
             }
           }
         }
       }
     },
     "stockCards": {
-      "type": "ARRAY",
-      "items": {
-        "type": "OBJECT",
-        "required": ["ticker", "company", "sector", "weight", "metrics", "reportUrl"],
-        "properties": {
-          "ticker": { "type": "STRING" },
-          "company": { "type": "STRING" },
-          "sector": { "type": "STRING" },
-          "weight": { "type": "STRING" },
-          "metrics": {
-            "type": "ARRAY",
-            "items": {
-              "type": "OBJECT",
-              "required": ["label", "value"],
-              "properties": {
-                "label": { "type": "STRING" },
-                "value": { "type": "STRING" }
-              }
-            }
-          },
-          "reportUrl": { "type": "STRING" }
-        }
-      }
-    },
-    "contacts": {
-      "type": "ARRAY",
-      "items": {
-        "type": "OBJECT",
-        "required": ["name", "phone", "email"],
-        "properties": {
-          "name": { "type": "STRING" },
-          "phone": { "type": "STRING" },
-          "email": { "type": "STRING" }
-        }
-      }
-    },
-    "legalText": { "type": "STRING" },
-    "copyrightYear": { "type": "INTEGER" },
-    "shareCard": {
-      "type": "OBJECT",
-      "required": ["eyebrow", "headlineShort", "heroStat", "topPicks", "ctaUrl", "disclaimerShort"],
-      "properties": {
-        "eyebrow": { "type": "STRING" },
-        "headlineShort": { "type": "STRING", "minLength": 10, "maxLength": 70 },
-        "heroStat": {
-          "type": "OBJECT",
-          "required": ["value", "label"],
-          "properties": {
-            "value": { "type": "STRING" },
-            "label": { "type": "STRING" }
-          }
-        },
-        "topPicks": {
-          "type": "ARRAY",
-          "items": { "type": "STRING" }
-        },
-        "ctaUrl": { "type": "STRING" },
-        "disclaimerShort": { "type": "STRING", "minLength": 10 }
-      }
+      "type": "array",
+      "items": { "type": "object", "required": ["ticker", "weight", "metrics"] }
     }
   }
 }

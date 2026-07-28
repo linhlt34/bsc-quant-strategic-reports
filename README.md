@@ -1,194 +1,102 @@
-# BSC Quant Research — Report System
+# BSC Quant Strategic Reports
 
-Hệ thống báo cáo chiến lược đầu tư config-driven cho **BSC Securities (Quant Research)**.  
-Thiết kế cho đối tượng nhà đầu tư cá nhân cao tuổi / high-NAV — tối ưu khả năng đọc và PDF export.
+Project tạo báo cáo HTML/PDF theo giao diện BSC GA_v9, nhưng **không dùng GA_v9 làm template nguồn**. Giao diện được viết trực tiếp trong component và CSS của project.
 
----
+## Nguyên tắc kiến trúc
 
-## Cấu trúc dự án
+- Giữ `data/report-data.json` làm đầu vào thủ công mặc định.
+- Renderer chỉ đọc dữ liệu đã được resolve, không gọi trực tiếp MCP/database.
+- FiinPro và BSC database được chừa sẵn dưới dạng provider overlay, mặc định tắt.
+- Web và Print dùng cùng một template `src/templates/report.html`.
+- Giao diện v9 nằm trực tiếp tại `src/styles/report.css`, không có lớp `v9-report-ui.css` ghi đè.
+- Chart được tạo từ `chart.data`, footer được tạo từ `contacts`, link card lấy từ `reportUrl`.
 
+## Cấu trúc
+
+```text
+app/
+  build.py                 Build orchestration
+  providers/               Manual + cổng Fiin/BSC
+  report/                  Validate, chart, renderer
+config/
+  data-sources.json        Bật/tắt nguồn dữ liệu
+data/
+  report-data.json         Dữ liệu nhập tay hiện tại
+  raw/                     Dữ liệu bridge tương lai
+  overrides/               Ghi đè có kiểm soát
+  generated/               Dữ liệu đã resolve + lineage
+src/
+  partials/                Cấu phần báo cáo cũ đã chỉnh lại
+  templates/report.html    Một template cho Web và Print
+  styles/                  CSS gốc, print, editor, share
+  scripts/editor.js        Inline editor
+dist/                      Output
 ```
-bsc-quant-research/
-├── theme.config.json        ← Design tokens: màu sắc + type scale
-├── data/
-│   └── report-data.json     ← Nội dung báo cáo: tickers, số liệu, metadata
-├── build/
-│   └── generate.js          ← Build script: inject tokens → dist/index.html
-├── scripts/
-│   └── export-pdf.js        ← Puppeteer: xuất PDF A4
-├── dist/
-│   └── index.html           ← 📄 File báo cáo cuối — standalone, không cần server
-├── assets/
-│   └── img/
-│       └── logo.png         ← Logo BSC (đặt file vào đây)
-└── package.json
+
+## Chạy project
+
+### Windows
+
+```powershell
+powershell -ExecutionPolicy Bypass -File build.ps1
+powershell -ExecutionPolicy Bypass -File export.ps1
 ```
 
----
-
-## Bắt đầu nhanh
-
-### 1. Cài đặt Node.js dependencies (lần đầu)
+### macOS/Linux
 
 ```bash
-npm install
+python3 app/build.py
 ```
 
-### 2. Xem báo cáo
+Output chính:
 
-Mở trực tiếp file `dist/index.html` trên trình duyệt — không cần server.
-
-```bash
-npm run preview
+```text
+dist/index.html
+dist/BSC-QUANT-YYYY-MM/web.html
+dist/BSC-QUANT-YYYY-MM/print.html
+dist/BSC-QUANT-YYYY-MM/share.html
 ```
 
-### 3. Build (sau khi thay đổi theme.config.json hoặc data/)
+## Cập nhật dữ liệu hiện tại
 
-```bash
-npm run build
-```
+Chỉ sửa `data/report-data.json`, sau đó chạy build. Cấu trúc dữ liệu cũ vẫn được giữ để không phá workflow hiện tại.
 
-### 4. Xuất PDF
+## Cổng dữ liệu tương lai
 
-**Cách A — Nhanh (browser):** Mở `dist/index.html` → nhấn nút **🖨️ Xuất PDF** hoặc `Ctrl+P` → Save as PDF → A4 Portrait
-
-**Cách B — Puppeteer (batch/CI):**
-```bash
-npm run export
-# → dist/BSC_Quant_Research_YYYYMMDD.pdf
-
-# Tên custom:
-npm run export -- --output=Q3_2026_Nang_Hang.pdf
-```
-
----
-
-## Cập nhật báo cáo mới
-
-### Thay đổi số liệu / nội dung
-
-Chỉ cần sửa `data/report-data.json`, sau đó chạy `npm run build`:
+`config/data-sources.json` mặc định:
 
 ```json
-// data/report-data.json
 {
-  "meta": {
-    "reportTitle": "Danh mục ...",
-    "period": "Q4 2026",
-    "issueDate": "01/10/2026"
-  },
-  "hero": {
-    "heroStats": [
-      { "label": "VN-Index Target", "value": "1,550", ... }
-    ]
+  "mode": "manual",
+  "providers": {
+    "manual": { "enabled": true },
+    "fiin": { "enabled": false },
+    "bsc": { "enabled": false }
   }
 }
 ```
 
-### Thay đổi màu sắc / font size
+Khi chưa có kết nối thật, provider Fiin/BSC có thể đọc overlay JSON trong `data/raw/`. Khi đã rõ cách kết nối, chỉ thay logic trong `app/providers/overlay.py` hoặc tách adapter riêng; không cần sửa template, CSS hay build output.
 
-Sửa `theme.config.json`:
+Thứ tự resolve hiện tại:
 
-```json
-{
-  "colors": {
-    "bscBlue": "#295CA9",    ← Màu chủ đạo BSC
-    "bscTeal": "#009B87",    ← Accent teal
-    ...
-  },
-  "typeScale": {
-    "body": { "size": "14px", "weight": 400, ... }
-  }
-}
+```text
+Manual base → Fiin overlay → BSC overlay → Manual overrides
 ```
 
-> ⚠️ **Hard rule**: Không được đặt `size` < `12px` trong bất kỳ cấp nào.  
-> Build script sẽ báo lỗi và dừng lại nếu vi phạm.
+Danh sách object có trường `ticker` được merge theo ticker. Các danh sách thời gian như chart/heatmap được thay toàn bộ để giữ đúng thứ tự.
 
-### Thay logo
+## Inline editor
 
-Đặt file logo vào `assets/img/logo.png`.  
-File PNG nền trong suốt, chiều cao khuyến nghị 80–100px (retina 2x).
+`dist/index.html` vẫn có:
 
----
+- Chỉnh sửa trực tiếp.
+- Lưu localStorage.
+- Đặt lại dữ liệu gốc.
+- In/Xuất PDF từ trình duyệt.
 
-## Inline Editor (trình sửa trực tiếp)
+Inline editor chỉ sửa bản hiển thị trên trình duyệt. Muốn cập nhật chính thức, sửa `data/report-data.json` và build lại.
 
-`dist/index.html` có toolbar chỉnh sửa tích hợp:
+## Lưu ý font
 
-| Nút | Chức năng |
-|-----|-----------|
-| ✏️ Chỉnh sửa | Bật/tắt chế độ edit — click vào text để sửa |
-| 💾 Lưu | Lưu vào localStorage trình duyệt |
-| ↩ Reset | Xóa state đã lưu, tải lại bản gốc |
-| 🖨️ Xuất PDF | Gọi `window.print()` |
-
-> **Lưu ý quan trọng**: Chỉnh sửa inline là tạm thời (lưu localStorage trên máy đó). Để thay đổi vĩnh viễn và đồng bộ lên GitHub → cập nhật `data/report-data.json` và chạy `npm run build`.
-
----
-
-## Design System
-
-### Color Roles
-
-| Token | Hex | Vai trò |
-|-------|-----|---------|
-| `--bsc-blue` | `#295CA9` | Brand primary, heading, CTA |
-| `--bsc-teal` | `#009B87` | Accent positive, biểu đồ |
-| `--bsc-gold` | `#FFC132` | Highlight badge (dùng <5% diện tích) |
-| `--positive`  | `#16A34A` | Tăng/lãi |
-| `--negative`  | `#DC2626` | Giảm/lỗ/rủi ro |
-| `--text-1`    | `#0F172A` | Heading, số liệu — contrast 19:1 |
-| `--text-2`    | `#475569` | Body text — contrast 7.5:1 |
-| `--text-3`    | `#64748B` | Caption, meta — contrast 4.6:1 ≥ AA |
-
-### Type Scale (Major Second ~1.125)
-
-| Cấp | Size | Dùng cho |
-|-----|------|----------|
-| Display | 38px | Hero numbers |
-| H1 | 28px | Report title |
-| H2 | 22px | Section headings |
-| H3 | 18px | Sub-sections |
-| H4 | 16px | Card headings, tickers |
-| Body-lg | 15px | Lede, key text |
-| Body | 14px | Table data, content |
-| Label | 12px | Uppercase labels (= floor) |
-| Caption | 12px | Notes, disclaimer (= floor) |
-
-**WCAG AA compliance**: Tất cả cặp text/background đạt ≥ 4.5:1.
-
----
-
-## Deploy GitHub
-
-```bash
-git init
-git add .
-git commit -m "feat: BSC Quant Research report system v1.0"
-git remote add origin https://github.com/<your-org>/bsc-quant-research.git
-git push -u origin main
-```
-
-**GitHub Pages** (nếu cần host online):
-```
-Settings → Pages → Source: main branch / dist folder
-```
-
----
-
-## Workflow khuyến nghị
-
-```
-1. Cập nhật số liệu   →  data/report-data.json
-2. Build              →  npm run build
-3. Review trên browser →  npm run preview
-4. Chỉnh sửa nhỏ     →  Dùng Inline Editor (✏️)
-5. Xuất PDF           →  🖨️ Xuất PDF (browser) hoặc npm run export
-6. Commit & push      →  git add . && git commit && git push
-```
-
----
-
-*BSC Securities — Quant Research Division*  
-*© 2026 BSC. Bảo lưu mọi quyền.*
+CSS dùng Nunito từ Google Fonts và có fallback hệ thống. Trong môi trường nội bộ không có Internet, có thể bổ sung font cục bộ vào hệ thống build của BSC; không cần thay component hoặc dữ liệu.

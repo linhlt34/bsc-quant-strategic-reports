@@ -1,16 +1,14 @@
 <tr>
-  <td class="ticker">{{ ticker }}</td>
-  <td class="sector">{{ sector }}</td>
-  <td class="price mono">{{ buyPrice }}</td>
-  <td class="num mono">{{ peTtm }}</td>
-  <td class="num mono">{{ pbTtm }}</td>
-  <td class="num mono">{{ profitGrowth }}</td>
+  <td class="ticker" data-edit>{{ ticker }}</td>
+  <td class="sector" data-edit>{{ sector }}</td>
+  <td class="price mono" data-edit>{{ buyPrice }}</td>
+  <td class="num mono" data-edit>{{ peTtm }}</td>
+  <td class="num mono" data-edit>{{ pbTtm }}</td>
+  <td class="num mono" data-edit>{{ profitGrowth }}</td>
   <td class="weight-cell">
     <div class="weight-inline">
-      <div class="weight-bar-track">
-        <div class="weight-bar-fill" style="width:{{ weight }}%"></div>
-      </div>
-      <div class="weight-num">{{ weight }}%</div>
+      <div class="weight-bar-track"><div class="weight-bar-fill" style="width:{{ weight }}%"></div></div>
+      <div class="weight-num" data-edit>{{ weight }}%</div>
     </div>
   </td>
 </tr>
