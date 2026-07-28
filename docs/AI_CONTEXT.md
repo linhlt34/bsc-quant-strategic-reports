@@ -11,7 +11,7 @@ This repo builds static BSC Quant/Strategic Research reports. The user cares str
 - `app/`: Python build/render engine.
 - `report/`: source assets for the report format.
 - `scripts/`: terminal commands for build/export/preview.
-- `dist/`: generated deliverables.
+- `dist/`: generated deliverables only: `web.html`, `print.html`, `share.html`, `print.pdf`, `share.png`.
 
 ## Build Flow
 
@@ -22,7 +22,7 @@ config/data-sources.json
   -> data/generated/report-data.json
   -> app/report/
   -> report/
-  -> dist/
+  -> dist/web.html + dist/print.html + dist/share.html
 ```
 
 ## Important Files
@@ -53,7 +53,7 @@ rg "##[A-Z_]+##|\{\{[^}]+\}\}" dist
 
 ## Guardrails
 
-- Do not treat `dist/` as source.
+- Do not treat `dist/` as source. Keep it flat; do not recreate dated subfolders unless the user explicitly asks for archive releases.
 - Keep durable fixes in `data/`, `config/`, `app/`, or `report/`.
 - Prefer global token/style changes before component-specific overrides.
 - Keep Vietnamese text UTF-8 clean.

@@ -204,8 +204,7 @@ def render_project(project_root: Path, data: dict[str, Any], theme: dict[str, An
     for key, value in components.items():
         report_template = report_template.replace(f"##PARTIAL_{key.upper().replace('-', '_')}##", value)
 
-    doc_code = str(data["meta"]["docCode"])
-    output_dir = project_root / "dist" / doc_code
+    output_dir = project_root / "dist"
     output_dir.mkdir(parents=True, exist_ok=True)
 
     web_html = replace_tokens(report_template, {
@@ -247,13 +246,4 @@ def render_project(project_root: Path, data: dict[str, Any], theme: dict[str, An
     assert_no_tokens(share_html, "share.html")
     write_text(output_dir / "share.html", share_html)
 
-    shortcuts = {
-        project_root / "dist/index.html": web_html,
-        project_root / "dist/index-web.html": web_html,
-        project_root / "dist/web.html": web_html,
-        project_root / "dist/print.html": print_html,
-        project_root / "dist/share.html": share_html,
-    }
-    for path, content in shortcuts.items():
-        write_text(path, content)
     return [output_dir / "web.html", output_dir / "print.html", output_dir / "share.html"]

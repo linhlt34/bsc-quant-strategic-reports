@@ -22,19 +22,21 @@ $dataFile = "data/generated/report-data.json"
 if (-not (Test-Path $dataFile)) {
   throw "Missing data/generated/report-data.json. Run scripts/build.ps1 before scripts/export.ps1."
 }
-$data = Get-Content $dataFile -Raw -Encoding UTF8 | ConvertFrom-Json
-$docCode = $data.meta.docCode
-$destDir = Join-Path $projectRoot "dist/$docCode"
-if (-not (Test-Path $destDir)) {
-  throw "Missing dist/$docCode. Run scripts/build.ps1 before scripts/export.ps1."
+
+$destDir = Join-Path $projectRoot "dist"
+$printHtml = Join-Path $destDir "print.html"
+$shareHtml = Join-Path $destDir "share.html"
+if (-not (Test-Path $printHtml)) {
+  throw "Missing dist/print.html. Run scripts/build.ps1 before scripts/export.ps1."
+}
+if (-not (Test-Path $shareHtml)) {
+  throw "Missing dist/share.html. Run scripts/build.ps1 before scripts/export.ps1."
 }
 
 $tempDir = Join-Path $env:TEMP "bsc-quant-export"
 if (Test-Path $tempDir) { Remove-Item $tempDir -Recurse -Force }
 New-Item -ItemType Directory -Path $tempDir | Out-Null
 
-$printHtml = Join-Path $destDir "print.html"
-$shareHtml = Join-Path $destDir "share.html"
 $pdfTemp = Join-Path $tempDir "print.pdf"
 $pngTemp = Join-Path $tempDir "share.png"
 $profile = Join-Path $tempDir "edge-profile"
@@ -65,8 +67,6 @@ if ($null -ne $pngExitCode -and $pngExitCode -ne 0) {
 
 Copy-Item $pdfTemp (Join-Path $destDir "print.pdf") -Force
 Copy-Item $pngTemp (Join-Path $destDir "share.png") -Force
-Copy-Item $pdfTemp "dist/print.pdf" -Force
-Copy-Item $pngTemp "dist/share.png" -Force
 for ($i = 0; $i -lt 10 -and (Test-Path $tempDir); $i++) {
   try {
     Remove-Item $tempDir -Recurse -Force -ErrorAction Stop
@@ -77,4 +77,4 @@ for ($i = 0; $i -lt 10 -and (Test-Path $tempDir); $i++) {
 if (Test-Path $tempDir) {
   Write-Host "[WARN] Temporary export folder is still locked: $tempDir" -ForegroundColor Yellow
 }
-Write-Host "[DONE] Exported PDF and PNG to dist/$docCode" -ForegroundColor Green
+Write-Host "[DONE] Exported PDF and PNG to dist" -ForegroundColor Green

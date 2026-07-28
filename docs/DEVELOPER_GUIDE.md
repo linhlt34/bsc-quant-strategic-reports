@@ -28,8 +28,8 @@ powershell -ExecutionPolicy Bypass -File scripts/export.ps1
 4. Optional overlays are merged by `app/providers/merge.py`.
 5. Resolved data is written to `data/generated/report-data.json`.
 6. `app/report/validate.py` checks required sections.
-7. `app/report/render.py` combines data with `report/` assets and writes HTML to `dist/`.
-8. `scripts/export.ps1` exports PDF/PNG using Microsoft Edge headless.
+7. `app/report/render.py` combines data with `report/` assets and writes `dist/web.html`, `dist/print.html`, and `dist/share.html`.
+8. `scripts/export.ps1` exports `dist/print.pdf` and `dist/share.png` using Microsoft Edge headless.
 
 ## Folder Responsibilities
 
@@ -47,7 +47,7 @@ powershell -ExecutionPolicy Bypass -File scripts/export.ps1
 - Keep global spacing/type/color changes in `config/theme.json` or shared CSS.
 - Preserve table, chart, font, and text-color behavior unless the requested change is specifically visual.
 - Fix Vietnamese text in `data/`, `report/`, or `app/`, then rebuild.
-- Do not patch generated files in `dist/` manually.
+- Do not patch generated files in `dist/` manually. The folder should only contain `web.html`, `print.html`, `share.html`, `print.pdf`, and `share.png`.
 
 ## Pre-Merge Checklist
 

@@ -34,7 +34,7 @@ bsc-quant-research/
   docs/                        Developer and AI documentation
   references/                  Visual references and notes
   tests/                       Pytest checks
-  dist/                        Generated HTML/PDF/PNG deliverables
+  dist/                        Generated deliverables only: web.html, print.html, share.html, print.pdf, share.png
 ```
 
 Why `scripts/` and `report/js/` are separate:
@@ -69,9 +69,9 @@ config/data-sources.json
   -> data/generated/report-data.json
   -> app/report/
   -> report/templates + report/partials + report/styles + report/js
-  -> dist/*.html
+  -> dist/web.html + dist/print.html + dist/share.html
   -> scripts/export.ps1
-  -> dist/*.pdf + dist/*.png
+  -> dist/print.pdf + dist/share.png
 ```
 
 ## Where To Edit
@@ -85,7 +85,7 @@ config/data-sources.json
 - Build/render logic: `app/`
 - Export/preview commands: `scripts/`
 
-Do not edit `dist/*.html` as the long-term fix. `dist/` is generated for sharing and review.
+Do not edit `dist/*.html` as the long-term fix. `dist/` is generated for sharing and review, and should only contain `web.html`, `print.html`, `share.html`, `print.pdf`, and `share.png`.
 
 ## Checks
 
