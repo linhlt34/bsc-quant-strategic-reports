@@ -1,29 +1,28 @@
 ﻿# BSC Quant Strategic Reports
 
-Config-driven report system for BSC Quant/Strategic Research. The project builds a self-contained investment strategy report in three targets:
+Static report renderer for BSC Quant/Strategic Research. The project produces institutional HTML/PDF/share-card reports from structured JSON data and brand-controlled templates.
 
-- `web.html` for browser review and inline editing.
-- `print.html` for A4 PDF export.
-- `share.html` plus `share.png` for social/share cards.
+The active development branch is `LL`. It has merged the flattened `gianganh-intheflow-patch-1` architecture, so the project now uses the Python modular pipeline as the main renderer. PowerShell scripts remain as Windows-friendly entry points.
 
-The current working branch is intended to continue development on `LL` before merging back to `main`.
+## Branch Context
 
-## Current Context
+- `main`: clean baseline branch after removing the accidental nested upload folder.
+- `gianganh-intheflow-patch-1`: source branch that flattened the uploaded project into root and introduced the modular Python pipeline.
+- `LL`: active development branch. Continue work here before merging back to `main`.
 
-This repository has recently been cleaned after an accidental nested upload:
+Expected merge direction:
 
-- `main` is the clean production-style branch.
-- `gianganh-intheflow-patch-1` contains a flattened experimental/project-structure branch that introduced `app/`, `config/`, `tests/`, `src/styles/`, and `src/scripts/`.
-- `LL` is the active development branch created from `main` for continuing work safely before merging back.
+```text
+LL -> main
+```
 
-Important: the current `LL` branch follows the PowerShell build pipeline, not the Python `app/` pipeline from `gianganh-intheflow-patch-1` unless that work is intentionally merged later.
-
-## What This Project Produces
+## Outputs
 
 Build output is written to:
 
 ```text
 dist/
+  index.html
   index-web.html
   web.html
   print.html
@@ -38,214 +37,167 @@ dist/
     share.png
 ```
 
-The source of truth is not `dist/`. Treat `dist/` as generated output. Edit `data/`, `theme.config.json`, `src/partials/`, `src/templates/`, and the build/export scripts instead.
+Treat `dist/` as generated output. Durable changes belong in `data/`, `config/`, `app/`, `src/`, `theme.config.json`, `build.ps1`, or `export.ps1`.
 
 ## Quick Start
 
-From the repository root:
+From repo root:
 
 ```powershell
 cd "D:\Documents\Dev\Strategic Market report\bsc-quant-research"
-npm run build
-npm run export
+powershell -ExecutionPolicy Bypass -File build.ps1
+powershell -ExecutionPolicy Bypass -File export.ps1
 ```
 
-Equivalent direct commands:
+Alternative if Python is on PATH:
+
+```powershell
+python app/build.py
+```
+
+NPM shortcuts:
+
+```powershell
+npm run build
+npm run export
+npm run preview
+```
+
+Note: `npm run build` calls `python app/build.py`. If Windows cannot find `python`, use `build.ps1`; it also tries the `py -3` launcher.
+
+## Repository Structure
+
+```text
+app/
+  build.py                 Build orchestration
+  providers/               Data providers and merge logic
+  report/                  Validation, chart rendering, HTML renderer, utilities
+
+config/
+  data-sources.json        Manual/Fiin/BSC provider switches
+
+data/
+  report-data.json         Manual base data; current main input
+  chart-reference.json     Chart reference data
+  raw/                     Future raw/bridge source files
+  overrides/               Manual override files
+  generated/               Resolved report data and lineage after build
+
+src/
+  partials/                Reusable HTML report components
+  templates/report.html    Shared Web/Print report template
+  templates/share.html     Share-card template
+  styles/report.css        Main report styling
+  styles/print.css         Print-specific styling
+  styles/share.css         Share-card styling
+  styles/editor.css        Inline editor styling
+  scripts/editor.js        Inline editor behavior
+
+dist/                      Generated HTML/PDF/PNG output
+assets/img/logo.svg        BSC logo, embedded by renderer
+theme.config.json          Brand tokens, type scale, spacing
+build.ps1                  Windows build wrapper around Python renderer
+export.ps1                 Edge headless PDF/PNG export
+```
+
+## Architecture
+
+The build is data-first and provider-aware:
+
+```text
+config/data-sources.json
+        |
+        v
+app.providers.resolve_report_data()
+        |
+        v
+data/generated/report-data.json + data/generated/data-lineage.json
+        |
+        v
+app.report.validate.validate_report()
+        |
+        v
+app.report.render.render_project()
+        |
+        v
+dist/*.html
+        |
+        v
+export.ps1 -> PDF + PNG
+```
+
+Current provider order:
+
+```text
+Manual base -> Fiin overlay -> BSC overlay -> Manual overrides
+```
+
+By default only the manual provider is enabled.
+
+## Data Workflow
+
+For normal report updates, edit:
+
+```text
+data/report-data.json
+```
+
+Then run:
 
 ```powershell
 powershell -ExecutionPolicy Bypass -File build.ps1
 powershell -ExecutionPolicy Bypass -File export.ps1
 ```
 
-Preview the latest web report:
-
-```powershell
-npm run preview
-```
-
-`export.ps1` uses Microsoft Edge headless to generate the PDF and share PNG.
-
-## Repository Structure
+`app/build.py` also writes the resolved data to:
 
 ```text
-assets/
-  fonts/                  Self-hosted Nunito font files used by build.ps1
-  img/logo.svg            BSC logo, embedded as base64 at build time
-
-data/
-  report-data.json        Main report content and numbers
-  schema.json             Intended data shape reference
-  report-data.json.bak    Backup data file, not the primary source
-
-dist/
-  Generated HTML/PDF/PNG outputs
-
-references/
-  BSC_Quant_Research_editable_saved.html
-                           Visual reference/source-of-truth for approved format
-
-scripts/
-  download-fonts.ps1      Helper to fetch/update font assets
-
-src/partials/
-  topbar.html
-  hero.html
-  rec-table.html
-  rec-table-row.html
-  chart.html
-  heatmap.html
-  stock-cards.html
-  stock-card-item.html
-  share-stock-card-item.html
-  footer.html
-
-src/templates/
-  web.html                Browser/editable target template
-  print.html              A4/PDF target template
-  share.html              Share-card target template
-  share-css.css           Share-card CSS based on the approved visual format
-
-theme.config.json         Global design tokens
-build.ps1                 Build pipeline: data + tokens + partials -> HTML
-export.ps1                Export pipeline: print.html -> PDF, share.html -> PNG
-package.json              Convenience scripts
+data/generated/report-data.json
+data/generated/data-lineage.json
 ```
 
-## Build Pipeline
+These generated files are useful for audit/debugging which providers were applied.
 
-`build.ps1` is the main renderer.
+## Validation Rules
 
-High-level flow:
+`app/report/validate.py` currently checks:
 
-1. Read `theme.config.json` and `data/report-data.json`.
-2. Validate key data rules:
-   - `meta.docCode` must match `BSC-QUANT-YYYY-MM`.
-   - type scale sizes must be `>= 12px`.
-   - `shareCard.topPicks` must exist in recommendations.
-   - recommendation weights must total `100`.
-3. Inline assets:
-   - Nunito fonts from `assets/fonts/*.woff2`.
-   - BSC logo from `assets/img/logo.png` or `assets/img/logo.svg`.
-   - QR SVG from `shareCard.ctaUrl`, with offline fallback.
-4. Render dynamic fragments:
-   - fact chips
-   - hero stats
-   - recommendation table rows
-   - chart SVG fragments
-   - heatmap rows
-   - stock cards
-   - share stock cards
-   - contact/footer blocks
-5. Compile target templates:
-   - `src/templates/web.html`
-   - `src/templates/print.html`
-   - `src/templates/share.html`
-6. Write generated files into `dist/<docCode>/` and root `dist/` shortcuts.
+- `meta.docCode` matches `BSC-QUANT-YYYY-MM`.
+- recommendation tickers are unique.
+- recommendation weights sum to `100`.
+- each recommendation ticker has a matching stock card.
+- chart labels, portfolio values, and VN-Index values have equal length.
+- share top picks are known tickers.
+- theme type sizes are valid and not below the safety floor.
 
-## Export Pipeline
+## Visual Rules
 
-`export.ps1` expects build output to already exist.
+This is a financial report, not a generic landing page. Preserve institutional layout and readability.
 
-It does the following:
+Key design anchors:
 
-1. Finds Microsoft Edge.
-2. Copies generated HTML files to a temp directory without spaces.
-3. Exports `print.html` to `print.pdf` with A4 settings.
-4. Checks PDF page count against `data.meta.pageCount`.
-5. Captures `share.html` as `share.png` at `1200x1500`.
-6. Copies final artifacts to both `dist/<docCode>/` and shortcut files in `dist/`.
+- Nunito font family.
+- BSC blue as primary heading/ticker/action color.
+- table, chart, heatmap, and card treatments in `src/styles/report.css`.
+- Web and Print use the same `src/templates/report.html`.
+- Share card is separate through `src/templates/share.html` and `src/styles/share.css`.
 
-If Edge fails inside a sandbox, run the export in a normal local terminal.
+Do not edit generated `dist/*.html` as the durable fix. Update source templates, styles, data, or renderer code instead.
 
-## Data Editing
+## Inline Editor
 
-Most report updates should start in `data/report-data.json`.
+`dist/index.html` includes inline editing:
 
-Common fields:
+- toggle edit mode
+- edit `[data-edit]` elements
+- save to localStorage
+- reset local browser state
 
-- `meta`: report title, period, doc code, issue date, page count.
-- `topbar`: brand and meta labels.
-- `hero`: title, lede, chips, hero stats.
-- `recTable.rows`: recommendation rows and weights.
-- `chart`: daily performance labels and series.
-- `heatmap`: monthly performance table.
-- `stockCards`: card-level metrics by ticker.
-- `contacts`: footer contact details.
-- `legalText`: long disclaimer HTML.
-- `shareCard`: share-card metadata, CTA URL, top picks.
-
-After changing data:
-
-```powershell
-npm run build
-npm run export
-```
-
-## Design And Format Rules
-
-The approved visual reference is:
-
-```text
-references/BSC_Quant_Research_editable_saved.html
-```
-
-The goal is to keep table, chart, font, color, and text treatment consistent with that file. Only global spacing and font sizing should be changed through `theme.config.json` unless the design intentionally changes.
-
-Design token rules:
-
-- Use `theme.config.json` for global colors, type scale, spacing, and radius.
-- Do not set font sizes below `12px`; the build fails this validation.
-- Keep Nunito as the report font unless the brand decision changes.
-- Keep BSC blue as the primary action/heading/ticker color.
-- Keep report outputs readable for PDF and browser review.
-
-## Branch Workflow
-
-Recommended daily flow on `LL`:
-
-```powershell
-git status
-git checkout LL
-git pull --rebase origin LL
-npm run build
-```
-
-If `LL` does not exist on a fresh machine:
-
-```powershell
-git fetch origin
-git checkout -b LL origin/LL
-```
-
-Before merging `LL` into `main`:
-
-```powershell
-git status
-npm run build
-npm run export
-git diff --stat main..LL
-```
-
-Expected merge direction:
-
-```text
-LL -> main
-```
-
-Use `gianganh-intheflow-patch-1` as a reference/prototype branch for the alternative Python/module pipeline. Do not mix it into `LL` casually; inspect and cherry-pick intentionally.
+Inline edits are browser-local only. To make changes permanent, update `data/report-data.json` and rebuild.
 
 ## Developer Docs
 
-Detailed developer guide:
+- `docs/DEVELOPER_GUIDE.md`: practical development workflow.
+- `docs/AI_CONTEXT.md`: project context and guardrails for AI coding agents.
 
-```text
-docs/DEVELOPER_GUIDE.md
-```
-
-AI context guide:
-
-```text
-docs/AI_CONTEXT.md
-```
-
-Read both before making structural changes.
+Read these before making structural changes.

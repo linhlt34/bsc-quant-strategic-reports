@@ -1,208 +1,210 @@
 ﻿# Developer Guide
 
-This guide explains how to develop the current PowerShell-based report system on branch `LL`.
+This guide covers the merged `LL` branch after bringing in `gianganh-intheflow-patch-1`. The project now uses a Python rendering pipeline with PowerShell wrappers for Windows.
 
 ## Mental Model
 
-The project is a static report generator. It does not run a backend service. The build script takes structured JSON plus HTML partials and CSS, then produces standalone HTML files and export-ready assets.
-
-Main development loop:
+The project is a static report generator:
 
 ```text
-Edit source -> build HTML -> review browser/PDF/share -> commit source + generated outputs if needed
+structured data + theme + templates + CSS -> standalone report files
+```
+
+There is no server. Build and export are batch commands.
+
+## Main Commands
+
+Windows-friendly build:
+
+```powershell
+powershell -ExecutionPolicy Bypass -File build.ps1
+```
+
+Direct Python build:
+
+```powershell
+python app/build.py
+```
+
+Export PDF/PNG:
+
+```powershell
+powershell -ExecutionPolicy Bypass -File export.ps1
+```
+
+Preview:
+
+```powershell
+npm run preview
 ```
 
 ## Source Of Truth
 
-Use these as source files:
+Edit these files for durable changes:
 
-- `data/report-data.json` for content and numbers.
-- `theme.config.json` for global visual tokens.
-- `src/partials/*.html` for reusable report sections.
-- `src/templates/*.html` for target-level HTML shells.
-- `src/templates/share-css.css` for share output styling.
-- `build.ps1` for render logic.
-- `export.ps1` for PDF/PNG generation.
+- `data/report-data.json`: manual base data.
+- `config/data-sources.json`: provider switches.
+- `theme.config.json`: brand/design tokens.
+- `app/providers/*.py`: data loading and merge behavior.
+- `app/report/*.py`: validation, chart rendering, HTML rendering.
+- `src/partials/*.html`: report components.
+- `src/templates/*.html`: target HTML shells.
+- `src/styles/*.css`: visual styling.
+- `src/scripts/editor.js`: inline editor behavior.
 
-Generated files live in `dist/`. Do not edit generated HTML manually unless the task is specifically to inspect or patch a one-off output. Durable fixes belong in source files.
+Generated files:
 
-## Build Targets
+- `data/generated/*.json`
+- `dist/*`
 
-### Web target
+Generated files may be committed when the workflow expects generated artifacts in Git, but they should not be the only place a fix is made.
 
-Source: `src/templates/web.html`
+## Build Flow By File
 
-Output:
+`build.ps1`
 
-```text
-dist/<docCode>/web.html
-dist/web.html
-dist/index-web.html
-```
+- Windows entry point.
+- Locates `python` or `py`.
+- Runs `app/build.py`.
 
-Purpose:
+`app/build.py`
 
-- browser review
-- inline editing workflow
-- easy local preview
+- loads `theme.config.json`.
+- resolves report data through providers.
+- validates report data.
+- writes `data/generated/report-data.json` and `data/generated/data-lineage.json`.
+- calls renderer to write target HTML.
 
-### Print target
+`app/providers/registry.py`
 
-Source: `src/templates/print.html`
+- reads `config/data-sources.json`.
+- loads manual base data.
+- optionally applies Fiin overlay.
+- optionally applies BSC overlay.
+- optionally applies manual overrides.
 
-Output:
+`app/providers/merge.py`
 
-```text
-dist/<docCode>/print.html
-dist/print.html
-dist/<docCode>/print.pdf
-dist/print.pdf
-```
+- deep merges dictionaries.
+- merges lists with `ticker` by ticker.
+- replaces order-sensitive lists such as chart and heatmap where appropriate.
 
-Purpose:
+`app/report/validate.py`
 
-- A4 print layout
-- PDF generation through Edge headless
+- guards data shape and business rules before rendering.
 
-### Share target
+`app/report/render.py`
 
-Source: `src/templates/share.html` and `src/templates/share-css.css`
+- renders dynamic HTML fragments.
+- reads partials, templates, CSS, editor JS.
+- writes `web.html`, `print.html`, and `share.html`.
 
-Output:
+`export.ps1`
 
-```text
-dist/<docCode>/share.html
-dist/share.html
-dist/<docCode>/share.png
-dist/share.png
-```
+- reads `data/generated/report-data.json`.
+- uses Microsoft Edge headless.
+- exports `print.pdf` and `share.png`.
 
-Purpose:
+## Provider System
 
-- social/share card
-- fixed screenshot size `1200x1500`
-
-## How Rendering Works
-
-`build.ps1` performs mostly string replacement. That means token names matter.
-
-Common token styles:
+Provider config lives at:
 
 ```text
-{{ meta.reportTitle }}
-{{ hero.title }}
-##PARTIAL_HERO##
-##THEME_FONTS##
-##THEME_CSS_VARIABLES##
-##TABLE_ROWS##
+config/data-sources.json
 ```
 
-When adding a new field:
+Default mode:
+
+```json
+{
+  "mode": "manual",
+  "baseProvider": "manual",
+  "providers": {
+    "manual": { "enabled": true, "path": "data/report-data.json" },
+    "fiin": { "enabled": false, "adapter": "overlay_file", "path": "data/raw/fiin-overlay.json" },
+    "bsc": { "enabled": false, "adapter": "overlay_file", "path": "data/raw/bsc-overlay.json" }
+  },
+  "overrides": { "enabled": false, "path": "data/overrides/manual-overrides.json" }
+}
+```
+
+Use this order for future data automation:
+
+```text
+manual base -> external overlays -> manual overrides
+```
+
+Keep renderer code independent from databases or MCP connections. Add adapters under `app/providers/` instead.
+
+## Adding A New Data Field
 
 1. Add the field to `data/report-data.json`.
-2. Add validation in `build.ps1` if the field is required or risky.
-3. Add replacement logic in the partial compilation section.
-4. Add the token to the relevant partial/template.
-5. Run `npm run build`.
-6. Search for unresolved tokens:
+2. Add schema/validation logic if the field is required.
+3. Add render logic in `app/report/render.py`.
+4. Add token/markup to a partial or template.
+5. Run build.
+6. Check for unresolved tokens.
+
+Useful check:
 
 ```powershell
-rg "##|{{" dist src
+rg "##[A-Z_]+##|\{\{[^}]+\}\}" dist src
 ```
 
-## Data Rules
+## Visual Development
 
-Current build validation checks:
-
-- `meta.docCode` format: `BSC-QUANT-YYYY-MM`.
-- every type scale size in `theme.config.json` must be at least `12px`.
-- `shareCard.topPicks` must be a subset of recommendation tickers.
-- recommendation weights must sum to `100`.
-
-Recommended extra checks before merge:
-
-- no mojibake in Vietnamese text: search for `Ã`, `Ä`, `Æ`, `á»`, `áº`, `�`.
-- no unresolved tokens in `dist`.
-- PDF page count matches `data.meta.pageCount`.
-- share image is `1200x1500`.
-
-Useful commands:
-
-```powershell
-rg "Ã|Ä|Æ|á»|áº|�" data src dist
-rg "##[A-Z_]+##|\{\{[^}]+\}\}" dist
-```
-
-## Visual Change Policy
-
-The approved format is anchored by:
+Main CSS lives in:
 
 ```text
-references/BSC_Quant_Research_editable_saved.html
+src/styles/report.css
+src/styles/print.css
+src/styles/share.css
+src/styles/editor.css
 ```
 
-When asked to preserve format:
+Guidelines:
 
-- preserve table widths, chart treatment, font family, brand colors, text colors, badges, card structure.
-- use `theme.config.json` for global spacing and type size changes.
-- avoid local one-off CSS overrides unless they are fixing a target-specific export issue.
-- keep web/share/print visually aligned.
+- preserve report density and PDF readability.
+- keep table and card dimensions stable.
+- keep chart labels readable.
+- keep Web and Print aligned because they share `src/templates/report.html`.
+- use `theme.config.json` for broad token changes.
 
-## Export Notes
+## Quality Checks
 
-`export.ps1` uses Edge headless. It may require normal local execution outside restricted sandboxes.
-
-Expected checks after export:
+Before pushing `LL`:
 
 ```powershell
-# PDF page count quick check
-$bytes=[IO.File]::ReadAllBytes((Join-Path $PWD 'dist/BSC-QUANT-2026-07/print.pdf'))
-$txt=[Text.Encoding]::ASCII.GetString($bytes)
-([regex]::Matches($txt,'/Type\s*/Page\b')).Count
+python app/build.py
+powershell -ExecutionPolicy Bypass -File export.ps1
+rg "##[A-Z_]+##|\{\{[^}]+\}\}" dist
+rg "Ã|Ä|Æ|á»|áº|�" data src dist
+```
 
-# Share image size
-Add-Type -AssemblyName System.Drawing
-$img=[Drawing.Image]::FromFile((Join-Path $PWD 'dist/BSC-QUANT-2026-07/share.png'))
-'{0}x{1}' -f $img.Width,$img.Height
-$img.Dispose()
+Check branch:
+
+```powershell
+git status
+git diff --stat main..LL
 ```
 
 ## Git Workflow
 
-Work on `LL` for development.
-
-Before starting:
+Develop on `LL`:
 
 ```powershell
-git status
 git checkout LL
-git pull --rebase origin LL
+git status
 ```
 
-Before pushing:
+Push `LL` after commits:
 
 ```powershell
-npm run build
-npm run export
-git status
-git diff --stat
-git add README.md docs data src theme.config.json build.ps1 export.ps1 dist
-git commit -m "Describe the change"
-git push origin LL
+git push -u origin LL
 ```
 
-Only merge into `main` after reviewing generated outputs.
-
-## Known Branch Context
-
-`gianganh-intheflow-patch-1` is not just a small feature branch. It contains a larger architecture experiment with Python modules:
+Merge back only after generated outputs are reviewed:
 
 ```text
-app/
-config/
-tests/
-src/styles/
-src/scripts/
+LL -> main
 ```
-
-That branch can be useful as a blueprint for a future refactor. Until the team decides to migrate, keep `LL` development aligned with the current PowerShell pipeline.

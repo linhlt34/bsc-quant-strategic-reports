@@ -1,37 +1,9 @@
-<div class="stock-card">
-<div class="sc-card-main">
-<div class="sc-head">
-<div class="sc-identity"><div class="sc-ticker">{{ ticker }}</div><div class="sc-sector">{{ sector }}</div></div>
-<span class="sc-badge"><span class="sc-badge-label">Tỷ trọng danh mục</span><span class="sc-badge-value">{{ weight }}%</span></span>
-</div>
-<div class="sc-metrics">
-<div class="metric-item">
-<div class="m-label">Vốn hóa<br></div>
-<div class="m-value">{{ mcap }}</div>
-</div>
-<div class="metric-item">
-<div class="m-label">Thanh khoản<br></div>
-<div class="m-value">{{ liq }}</div>
-</div>
-<div class="metric-item">
-<div class="m-label">Free float</div>
-<div class="m-value">{{ float }}%</div>
-</div>
-<div class="metric-item">
-<div class="m-label">Tăng trưởng <br>LNST svck</div>
-<div class="m-value">{{ growth }}%</div>
-</div>
-<div class="metric-item">
-<div class="m-label">P/E ttm</div>
-<div class="m-value">{{ pe }}x</div>
-</div>
-<div class="metric-item">
-<div class="m-label">P/B ttm</div>
-<div class="m-value">{{ pb }}x</div>
-</div>
-</div>
-</div>
-<div class="sc-action">
-<a class="btn-link" href="{{ link }}">Xem báo cáo phân tích chi tiết</a>
-</div>
-</div>
+<article class="share-stock-card">
+  <div class="share-stock-head"><b>{{ ticker }}</b><span>{{ weight }}</span></div>
+  <div class="share-sector">{{ sector }}</div>
+  <div class="share-metrics">
+    <span>Vốn hóa <b>{{ mcap }}</b></span><span>Thanh khoản <b>{{ liq }}</b></span>
+    <span>Free float <b>{{ float }}%</b></span><span>LNST svck <b>{{ growth }}%</b></span>
+    <span>P/E <b>{{ pe }}x</b></span><span>P/B <b>{{ pb }}x</b></span>
+  </div>
+</article>
