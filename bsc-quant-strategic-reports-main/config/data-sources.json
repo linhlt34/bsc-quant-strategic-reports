@@ -1,0 +1,24 @@
+{
+  "mode": "manual",
+  "baseProvider": "manual",
+  "providers": {
+    "manual": {
+      "enabled": true,
+      "path": "data/report-data.json"
+    },
+    "fiin": {
+      "enabled": false,
+      "adapter": "overlay_file",
+      "path": "data/raw/fiin-overlay.json"
+    },
+    "bsc": {
+      "enabled": false,
+      "adapter": "overlay_file",
+      "path": "data/raw/bsc-overlay.json"
+    }
+  },
+  "overrides": {
+    "enabled": false,
+    "path": "data/overrides/manual-overrides.json"
+  }
+}
