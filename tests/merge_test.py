@@ -1,12 +1,4 @@
-from pathlib import Path
-import sys
-
-ROOT = Path(__file__).resolve().parents[1]
-SRC = ROOT / "src"
-if str(SRC) not in sys.path:
-    sys.path.insert(0, str(SRC))
-
-from bsc_quant_research.providers.merge import deep_merge
+from app.providers.merge import deep_merge
 
 
 def test_deep_merge_merges_lists_by_ticker():

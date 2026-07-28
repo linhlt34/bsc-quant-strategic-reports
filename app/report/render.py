@@ -135,7 +135,7 @@ def _render_share_cards(cards: list[dict[str, Any]], template: str) -> str:
 
 
 def render_project(project_root: Path, data: dict[str, Any], theme: dict[str, Any]) -> list[Path]:
-    asset_root = project_root / "src" / "report_assets"
+    asset_root = project_root / "report"
     partial_dir = asset_root / "partials"
     template_dir = asset_root / "templates"
     style_dir = asset_root / "styles"
@@ -190,7 +190,7 @@ def render_project(project_root: Path, data: dict[str, Any], theme: dict[str, An
     ])
     print_css = read_text(style_dir / "print.css")
     editor_css = read_text(style_dir / "editor.css")
-    editor_js = read_text(asset_root / "scripts/editor.js").replace("##DOC_CODE##", json.dumps(str(data["meta"]["docCode"])))
+    editor_js = read_text(asset_root / "js/editor.js").replace("##DOC_CODE##", json.dumps(str(data["meta"]["docCode"])))
     toolbar = read_text(partial_dir / "editor-toolbar.html")
 
     report_template = read_text(template_dir / "report.html")

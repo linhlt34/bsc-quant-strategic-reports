@@ -7,7 +7,7 @@ ROOT = Path(__file__).resolve().parents[1]
 
 def test_report_build_smoke():
     result = subprocess.run(
-        [sys.executable, "src/bsc_quant_research/build.py"],
+        [sys.executable, "app/build.py"],
         cwd=ROOT,
         check=False,
     )

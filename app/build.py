@@ -4,15 +4,14 @@ import json
 import sys
 from pathlib import Path
 
-PROJECT_ROOT = Path(__file__).resolve().parents[2]
-SRC_ROOT = PROJECT_ROOT / "src"
-if str(SRC_ROOT) not in sys.path:
-    sys.path.insert(0, str(SRC_ROOT))
+PROJECT_ROOT = Path(__file__).resolve().parents[1]
+if str(PROJECT_ROOT) not in sys.path:
+    sys.path.insert(0, str(PROJECT_ROOT))
 
-from bsc_quant_research.providers import resolve_report_data
-from bsc_quant_research.report.render import render_project
-from bsc_quant_research.report.utils import dump_json
-from bsc_quant_research.report.validate import validate_report
+from app.providers import resolve_report_data
+from app.report.render import render_project
+from app.report.utils import dump_json
+from app.report.validate import validate_report
 
 
 def main() -> int:

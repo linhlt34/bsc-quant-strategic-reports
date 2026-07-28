@@ -4,7 +4,7 @@ $scriptDir = Split-Path -Parent $MyInvocation.MyCommand.Path
 $projectRoot = Split-Path -Parent $scriptDir
 Set-Location $projectRoot
 
-$entrypoint = Join-Path $projectRoot "src/bsc_quant_research/build.py"
+$entrypoint = Join-Path $projectRoot "app/build.py"
 $python = Get-Command python -ErrorAction SilentlyContinue
 if (-not $python) {
     $python = Get-Command py -ErrorAction SilentlyContinue

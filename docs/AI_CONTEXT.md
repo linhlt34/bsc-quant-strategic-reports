@@ -2,62 +2,58 @@
 
 ## Project Summary
 
-This repository builds static BSC Quant/Strategic Research reports. Preserve the institutional report format unless the user explicitly asks for a redesign. Web, Print/PDF, and Share-card outputs must stay visually consistent.
+This repo builds static BSC Quant/Strategic Research reports. The user cares strongly that Web, Share, and PDF preserve the approved report format: tables, charts, fonts, and text colors should stay consistent unless explicitly changed.
 
-## Source Of Truth
+## Folder Model
 
-- Report content: `data/report-data.json`
-- Theme/global tokens: `config/theme.json`
-- Data-source registry: `config/data-sources.json`
-- Python package: `src/bsc_quant_research/`
-- Report assets: `src/report_assets/`
-- Generated output: `dist/`
+- `data/`: editable report content.
+- `config/`: global setup, including theme tokens.
+- `app/`: Python build/render engine.
+- `report/`: source assets for the report format.
+- `scripts/`: terminal commands for build/export/preview.
+- `dist/`: generated deliverables.
 
-Do not treat `dist/` as source. Update source files and rebuild.
-
-## Architecture
+## Build Flow
 
 ```text
 config/data-sources.json
-  -> src/bsc_quant_research/providers/
+  -> data/report-data.json
+  -> app/providers/
   -> data/generated/report-data.json
-  -> src/bsc_quant_research/report/
-  -> src/report_assets/
+  -> app/report/
+  -> report/
   -> dist/
 ```
 
-Important modules:
+## Important Files
 
-- `src/bsc_quant_research/build.py`: build orchestration.
-- `src/bsc_quant_research/providers/merge.py`: deep merge behavior, including ticker-based list merge.
-- `src/bsc_quant_research/report/validate.py`: required data checks.
-- `src/bsc_quant_research/report/render.py`: HTML assembly and output writes.
-- `src/report_assets/styles/`: report, print, share, editor styling.
+- `app/build.py`: build orchestration.
+- `app/providers/merge.py`: deep merge behavior, including ticker-based list merge.
+- `app/report/validate.py`: required data checks.
+- `app/report/render.py`: HTML assembly.
+- `config/theme.json`: global color/type/spacing/radius tokens.
+- `report/styles/`: CSS for report, print, share, editor.
+- `report/templates/`: output shells.
+- `report/partials/`: reusable HTML sections.
 
-## Commands To Verify Work
+## Verify Changes
 
 ```powershell
 python -m pytest
-python src/bsc_quant_research/build.py
+python app/build.py
 powershell -ExecutionPolicy Bypass -File scripts/export.ps1
 ```
 
 Scans:
 
 ```powershell
-rg "<<<<<<<|=======|>>>>>>>"
+rg "^(<<<<<<<|=======|>>>>>>>)"
 rg "##[A-Z_]+##|\{\{[^}]+\}\}" dist
-rg "Ã|Ä|Æ|á»|áº|�" data src dist
 ```
 
-## Style Constraints
+## Guardrails
 
-- Preserve tables, charts, typography, and text colors from the approved report style unless explicitly requested.
-- Prefer global setup changes in `config/theme.json` and shared CSS before component-specific overrides.
-- Keep generated output reproducible.
-- Avoid broad refactors while making content/style fixes.
+- Do not treat `dist/` as source.
+- Keep durable fixes in `data/`, `config/`, `app/`, or `report/`.
+- Prefer global token/style changes before component-specific overrides.
 - Keep Vietnamese text UTF-8 clean.
-
-## Current Branch Context
-
-Use branch `LL` for continuing development. It already merged the cleaned `main` state and the flattened `gianganh-intheflow-patch-1` pipeline.

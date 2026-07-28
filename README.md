@@ -1,45 +1,46 @@
 # BSC Quant Strategic Reports
 
-Static report renderer for BSC Quant/Strategic Research. The project builds Web, Print/PDF, and Share-card outputs from structured JSON data, reusable HTML partials, controlled CSS, and a small Python renderer.
+Static report renderer for BSC Quant/Strategic Research. The repo is organized around four simple ideas: data, report format, build engine, and command scripts.
 
-## Current Branch
-
-Active development branch: `LL`.
-
-`LL` already includes the flattened pipeline from `gianganh-intheflow-patch-1` and uses the organized `src/` layout below.
-
-## Repository Layout
+## Folder Logic
 
 ```text
 bsc-quant-research/
-  config/
+  app/                         Python build engine
+    build.py                   Main build entrypoint
+    providers/                 Load and merge data sources
+    report/                    Validate data, render charts, render HTML
+  report/                      Report source format
+    images/                    Logo and report images
+    partials/                  Reusable HTML sections
+    templates/                 Page shells for web/print/share
+    styles/                    CSS for web, print, share, editor
+    js/                        Browser-side editor JavaScript
+  scripts/                     Terminal commands and automation
+    build.ps1                  Windows build command
+    build.sh                   Unix build command
+    export.ps1                 Export PDF/PNG using Edge headless
+    preview.ps1                Open generated web report
+  config/                      Global setup
     data-sources.json          Data provider registry
-    theme.json                 Global colors, typography, spacing tokens
-  data/
-    report-data.json           Manual source data for the current report
+    theme.json                 Colors, type scale, spacing, radius
+  data/                        Report content and resolved data
+    report-data.json           Main editable report data
     chart-reference.json       Chart/reference data
-    generated/                 Resolved data written by build
-    raw/                       Raw source drops, if any
-    overrides/                 Manual overlays, if any
-  dist/                        Generated HTML/PDF/PNG outputs
-  docs/
-    DEVELOPER_GUIDE.md         Developer workflow and architecture
-    AI_CONTEXT.md              Context for AI coding agents
-  references/                  Visual/reference notes
-  schemas/
-    report-data.schema.json    Report data contract
-  scripts/
-    build.ps1                  Windows build entrypoint
-    build.sh                   Unix build entrypoint
-    export.ps1                 Edge headless PDF/PNG export
-    preview.ps1                Open generated Web HTML
-  src/
-    bsc_quant_research/        Python package: providers, validation, rendering
-    report_assets/             HTML partials/templates, CSS, JS, images
-  tests/                       Pytest-compatible smoke and unit tests
-  package.json                 Convenience npm scripts
-  pyproject.toml               Python project/test metadata
+    generated/                 Build output data snapshots
+    raw/                       Raw source drops
+    overrides/                 Manual overlays
+  schemas/                     Data contracts
+  docs/                        Developer and AI documentation
+  references/                  Visual references and notes
+  tests/                       Pytest checks
+  dist/                        Generated HTML/PDF/PNG deliverables
 ```
+
+Why `scripts/` and `report/js/` are separate:
+
+- `scripts/` runs on your computer from terminal: build, export, preview.
+- `report/js/` runs inside the browser after the HTML is opened.
 
 ## Quick Start
 
@@ -47,67 +48,56 @@ bsc-quant-research/
 cd "D:\Documents\Dev\Strategic Market report\bsc-quant-research"
 git checkout LL
 git pull
-npm run build
-npm run export
-npm run preview
-```
-
-Direct Windows commands:
-
-```powershell
-powershell -ExecutionPolicy Bypass -File scripts/build.ps1
+python app/build.py
 powershell -ExecutionPolicy Bypass -File scripts/export.ps1
 ```
 
-Direct Python command:
+Convenience commands:
 
 ```powershell
-python src/bsc_quant_research/build.py
+npm run build
+npm run export
+npm run preview
 ```
 
 ## Build Flow
 
 ```text
 config/data-sources.json
-  -> data/report-data.json + optional overlays/raw sources
-  -> src/bsc_quant_research/providers/
+  -> data/report-data.json
+  -> app/providers/
   -> data/generated/report-data.json
-  -> src/bsc_quant_research/report/
-  -> src/report_assets/
+  -> app/report/
+  -> report/templates + report/partials + report/styles + report/js
   -> dist/*.html
   -> scripts/export.ps1
   -> dist/*.pdf + dist/*.png
 ```
 
-Treat `dist/` as generated output. Do not edit `dist/*.html` manually as the durable fix. Update `data/`, `config/theme.json`, `src/report_assets/`, or `src/bsc_quant_research/`, then rebuild.
+## Where To Edit
 
-## Where To Change What
+- Report text/content: `data/report-data.json`
+- Global font, spacing, color setup: `config/theme.json`
+- Table/card/section HTML: `report/partials/`
+- Page layout shells: `report/templates/`
+- Web/print/share CSS: `report/styles/`
+- Browser editor behavior: `report/js/editor.js`
+- Build/render logic: `app/`
+- Export/preview commands: `scripts/`
 
-- Content and Vietnamese text: `data/report-data.json`
-- Data-source behavior: `config/data-sources.json`, `src/bsc_quant_research/providers/`
-- Validation/render logic: `src/bsc_quant_research/report/`
-- Tables/cards/sections: `src/report_assets/partials/`
-- Page shells: `src/report_assets/templates/`
-- Fonts, spacing, colors, responsive rules: `config/theme.json`, `src/report_assets/styles/`
-- Inline editor behavior: `src/report_assets/scripts/editor.js`
-- Export workflow: `scripts/export.ps1`
+Do not edit `dist/*.html` as the long-term fix. `dist/` is generated for sharing and review.
 
-## Quality Checks
+## Checks
 
 ```powershell
 python -m pytest
-python src/bsc_quant_research/build.py
+python app/build.py
 powershell -ExecutionPolicy Bypass -File scripts/export.ps1
 ```
 
-Useful scans before merge:
+Useful scans:
 
 ```powershell
-rg "<<<<<<<|=======|>>>>>>>"
+rg "^(<<<<<<<|=======|>>>>>>>)"
 rg "##[A-Z_]+##|\{\{[^}]+\}\}" dist
-rg "Ã|Ä|Æ|á»|áº|�" data src dist
 ```
-
-## Development Rule
-
-Keep format changes source-driven. Web, Print/PDF, and Share outputs should preserve the same report identity: table/chart structure, typography, and text colors stay controlled by global theme/style files unless the requested change explicitly targets a component.

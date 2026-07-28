@@ -1,14 +1,14 @@
 {
-  "_comment": "BSC Quant Research - Design Token System. Sửa file này để thay đổi toàn bộ visual của report.",
+  "_comment": "BSC Quant Research design tokens. Edit this file for global visual changes.",
   "brand": {
     "name": "BSC Securities",
     "nameShort": "BSC",
     "division": "Quant Research",
     "website": "https://www.bsc.com.vn",
-    "logoPath": "src/report_assets/images/logo.svg"
+    "logoPath": "report/images/logo.svg"
   },
   "colors": {
-    "_comment": "Semantic color roles - mỗi màu gắn với một vai trò cố định.",
+    "_comment": "Semantic color roles. Keep each color tied to one stable role.",
     "bscBlue": "#295CA9",
     "bscTeal": "#009B87",
     "bscGold": "#FFC132",
@@ -26,7 +26,7 @@
     "line": "#E2E8F0"
   },
   "typeScale": {
-    "_comment": "Major Second ratio ~1.125. Hard floor = 12px; không dùng font nhỏ hơn ngưỡng này, kể cả khi in.",
+    "_comment": "Major Second ratio ~1.125. Hard floor = 12px, including print mode.",
     "display": { "size": "38px", "weight": 700, "lineHeight": 1.1, "usage": "Hero numbers, index targets" },
     "h1": { "size": "28px", "weight": 700, "lineHeight": 1.25, "usage": "Report title" },
     "h2": { "size": "22px", "weight": 600, "lineHeight": 1.3, "usage": "Section headings" },
@@ -35,7 +35,7 @@
     "bodyLg": { "size": "15px", "weight": 400, "lineHeight": 1.6, "usage": "Lede paragraph, key rec text" },
     "body": { "size": "14px", "weight": 400, "lineHeight": 1.55, "usage": "Table data, main content" },
     "label": { "size": "12px", "weight": 600, "lineHeight": 1.4, "usage": "Uppercase labels, chips, tags" },
-    "caption": { "size": "12px", "weight": 400, "lineHeight": 1.5, "usage": "Source notes, disclaimer - hard floor" }
+    "caption": { "size": "12px", "weight": 400, "lineHeight": 1.5, "usage": "Source notes, disclaimer" }
   },
   "spacing": {
     "pagePadding": "32px",
@@ -52,6 +52,6 @@
     "pageSize": "A4 portrait",
     "marginMm": 0,
     "widthMm": 210,
-    "_note": "Font-size minimum trong @media print: 12px. Scale xuống tối đa tới body=12px, label=12px; không thấp hơn ngưỡng này."
+    "_note": "Minimum font size in print mode is 12px. Do not scale body or label text below that floor."
   }
 }

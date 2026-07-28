@@ -1,10 +1,10 @@
 [project]
 name = "bsc-quant-research"
-version = "3.1.0"
+version = "3.2.0"
 description = "Static BSC Quant Research report renderer"
 requires-python = ">=3.10"
 
 [tool.pytest.ini_options]
 addopts = "-p no:cacheprovider"
-pythonpath = ["src"]
+pythonpath = ["."]
 testpaths = ["tests"]

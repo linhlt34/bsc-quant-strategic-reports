@@ -1,74 +1,60 @@
 # Developer Guide
 
-## Purpose
+## Mental Model
 
-This repo renders a static BSC Quant/Strategic Research report from JSON data. It is not a web app server. The durable source of truth is data + theme + templates + renderer code; `dist/` is generated output.
+The project has four working areas:
 
-## Standard Layout
+- `data/`: what the report says.
+- `report/`: how the report looks.
+- `app/`: how data becomes HTML.
+- `scripts/`: commands that run the workflow.
 
-- `src/bsc_quant_research/`: Python package.
-- `src/bsc_quant_research/providers/`: load and merge data sources.
-- `src/bsc_quant_research/report/`: validate data, render charts, render HTML.
-- `src/report_assets/`: static report source assets: partials, templates, styles, scripts, images.
-- `config/`: runtime configuration and global design tokens.
-- `data/`: report content, raw inputs, overlays, generated resolved data.
-- `schemas/`: data contracts.
-- `scripts/`: build/export/preview entrypoints.
-- `tests/`: pytest-compatible tests.
-- `dist/`: generated deliverables.
+This keeps source code, visual format, and terminal automation separate.
 
 ## Main Commands
 
 ```powershell
-npm run build
-npm run export
-npm run preview
+python app/build.py
 python -m pytest
-```
-
-Equivalent direct commands:
-
-```powershell
-python src/bsc_quant_research/build.py
 powershell -ExecutionPolicy Bypass -File scripts/build.ps1
 powershell -ExecutionPolicy Bypass -File scripts/export.ps1
 ```
 
 ## Build Internals
 
-1. `src/bsc_quant_research/build.py` loads `config/theme.json`.
-2. `providers/registry.py` reads `config/data-sources.json`.
-3. Manual data comes from `data/report-data.json` by default.
-4. Optional overlays are merged by `providers/merge.py`.
+1. `app/build.py` loads `config/theme.json`.
+2. `app/providers/registry.py` reads `config/data-sources.json`.
+3. Manual content comes from `data/report-data.json`.
+4. Optional overlays are merged by `app/providers/merge.py`.
 5. Resolved data is written to `data/generated/report-data.json`.
-6. `report/validate.py` checks required report sections.
-7. `report/render.py` combines data with `src/report_assets/` and writes HTML to `dist/`.
-8. `scripts/export.ps1` uses Microsoft Edge headless to create PDF/PNG.
+6. `app/report/validate.py` checks required sections.
+7. `app/report/render.py` combines data with `report/` assets and writes HTML to `dist/`.
+8. `scripts/export.ps1` exports PDF/PNG using Microsoft Edge headless.
 
-## Editing Guide
+## Folder Responsibilities
 
-- Add or fix report text in `data/report-data.json`.
-- Add a new data provider under `src/bsc_quant_research/providers/` and register it in `registry.py`.
-- Add a new visual section by updating data, validation, renderer logic, and a partial under `src/report_assets/partials/`.
-- Keep global spacing/type/color tokens in `config/theme.json` and shared CSS in `src/report_assets/styles/`.
-- Do not patch generated HTML in `dist/`; rebuild from source.
+- `app/providers/`: data adapters and merge rules.
+- `app/report/`: validation, chart rendering, HTML assembly.
+- `report/partials/`: reusable section fragments.
+- `report/templates/`: web/print/share shells.
+- `report/styles/`: CSS by output mode.
+- `report/js/`: browser-only JavaScript.
+- `scripts/`: shell/PowerShell workflow commands.
+- `schemas/`: data contracts.
 
-## Output Policy
+## Editing Rules
 
-`dist/` is generated but intentionally kept in the repository for easy sharing and review. Any committed output must be reproducible from current source by running build/export.
+- Keep global spacing/type/color changes in `config/theme.json` or shared CSS.
+- Preserve table, chart, font, and text-color behavior unless the requested change is specifically visual.
+- Fix Vietnamese text in `data/`, `report/`, or `app/`, then rebuild.
+- Do not patch generated files in `dist/` manually.
 
 ## Pre-Merge Checklist
 
 ```powershell
 python -m pytest
-npm run build
-npm run export
-rg "<<<<<<<|=======|>>>>>>>"
+python app/build.py
+powershell -ExecutionPolicy Bypass -File scripts/export.ps1
+rg "^(<<<<<<<|=======|>>>>>>>)"
 rg "##[A-Z_]+##|\{\{[^}]+\}\}" dist
-```
-
-If Vietnamese text looks broken, scan with:
-
-```powershell
-rg "Ã|Ä|Æ|á»|áº|�" data src dist
 ```
