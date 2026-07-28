@@ -1,194 +1,251 @@
-# BSC Quant Research — Report System
+﻿# BSC Quant Strategic Reports
 
-Hệ thống báo cáo chiến lược đầu tư config-driven cho **BSC Securities (Quant Research)**.  
-Thiết kế cho đối tượng nhà đầu tư cá nhân cao tuổi / high-NAV — tối ưu khả năng đọc và PDF export.
+Config-driven report system for BSC Quant/Strategic Research. The project builds a self-contained investment strategy report in three targets:
 
----
+- `web.html` for browser review and inline editing.
+- `print.html` for A4 PDF export.
+- `share.html` plus `share.png` for social/share cards.
 
-## Cấu trúc dự án
+The current working branch is intended to continue development on `LL` before merging back to `main`.
 
+## Current Context
+
+This repository has recently been cleaned after an accidental nested upload:
+
+- `main` is the clean production-style branch.
+- `gianganh-intheflow-patch-1` contains a flattened experimental/project-structure branch that introduced `app/`, `config/`, `tests/`, `src/styles/`, and `src/scripts/`.
+- `LL` is the active development branch created from `main` for continuing work safely before merging back.
+
+Important: the current `LL` branch follows the PowerShell build pipeline, not the Python `app/` pipeline from `gianganh-intheflow-patch-1` unless that work is intentionally merged later.
+
+## What This Project Produces
+
+Build output is written to:
+
+```text
+dist/
+  index-web.html
+  web.html
+  print.html
+  print.pdf
+  share.html
+  share.png
+  BSC-QUANT-YYYY-MM/
+    web.html
+    print.html
+    print.pdf
+    share.html
+    share.png
 ```
-bsc-quant-research/
-├── theme.config.json        ← Design tokens: màu sắc + type scale
-├── data/
-│   └── report-data.json     ← Nội dung báo cáo: tickers, số liệu, metadata
-├── build/
-│   └── generate.js          ← Build script: inject tokens → dist/index.html
-├── scripts/
-│   └── export-pdf.js        ← Puppeteer: xuất PDF A4
-├── dist/
-│   └── index.html           ← 📄 File báo cáo cuối — standalone, không cần server
-├── assets/
-│   └── img/
-│       └── logo.png         ← Logo BSC (đặt file vào đây)
-└── package.json
+
+The source of truth is not `dist/`. Treat `dist/` as generated output. Edit `data/`, `theme.config.json`, `src/partials/`, `src/templates/`, and the build/export scripts instead.
+
+## Quick Start
+
+From the repository root:
+
+```powershell
+cd "D:\Documents\Dev\Strategic Market report\bsc-quant-research"
+npm run build
+npm run export
 ```
 
----
+Equivalent direct commands:
 
-## Bắt đầu nhanh
-
-### 1. Cài đặt Node.js dependencies (lần đầu)
-
-```bash
-npm install
+```powershell
+powershell -ExecutionPolicy Bypass -File build.ps1
+powershell -ExecutionPolicy Bypass -File export.ps1
 ```
 
-### 2. Xem báo cáo
+Preview the latest web report:
 
-Mở trực tiếp file `dist/index.html` trên trình duyệt — không cần server.
-
-```bash
+```powershell
 npm run preview
 ```
 
-### 3. Build (sau khi thay đổi theme.config.json hoặc data/)
+`export.ps1` uses Microsoft Edge headless to generate the PDF and share PNG.
 
-```bash
+## Repository Structure
+
+```text
+assets/
+  fonts/                  Self-hosted Nunito font files used by build.ps1
+  img/logo.svg            BSC logo, embedded as base64 at build time
+
+data/
+  report-data.json        Main report content and numbers
+  schema.json             Intended data shape reference
+  report-data.json.bak    Backup data file, not the primary source
+
+dist/
+  Generated HTML/PDF/PNG outputs
+
+references/
+  BSC_Quant_Research_editable_saved.html
+                           Visual reference/source-of-truth for approved format
+
+scripts/
+  download-fonts.ps1      Helper to fetch/update font assets
+
+src/partials/
+  topbar.html
+  hero.html
+  rec-table.html
+  rec-table-row.html
+  chart.html
+  heatmap.html
+  stock-cards.html
+  stock-card-item.html
+  share-stock-card-item.html
+  footer.html
+
+src/templates/
+  web.html                Browser/editable target template
+  print.html              A4/PDF target template
+  share.html              Share-card target template
+  share-css.css           Share-card CSS based on the approved visual format
+
+theme.config.json         Global design tokens
+build.ps1                 Build pipeline: data + tokens + partials -> HTML
+export.ps1                Export pipeline: print.html -> PDF, share.html -> PNG
+package.json              Convenience scripts
+```
+
+## Build Pipeline
+
+`build.ps1` is the main renderer.
+
+High-level flow:
+
+1. Read `theme.config.json` and `data/report-data.json`.
+2. Validate key data rules:
+   - `meta.docCode` must match `BSC-QUANT-YYYY-MM`.
+   - type scale sizes must be `>= 12px`.
+   - `shareCard.topPicks` must exist in recommendations.
+   - recommendation weights must total `100`.
+3. Inline assets:
+   - Nunito fonts from `assets/fonts/*.woff2`.
+   - BSC logo from `assets/img/logo.png` or `assets/img/logo.svg`.
+   - QR SVG from `shareCard.ctaUrl`, with offline fallback.
+4. Render dynamic fragments:
+   - fact chips
+   - hero stats
+   - recommendation table rows
+   - chart SVG fragments
+   - heatmap rows
+   - stock cards
+   - share stock cards
+   - contact/footer blocks
+5. Compile target templates:
+   - `src/templates/web.html`
+   - `src/templates/print.html`
+   - `src/templates/share.html`
+6. Write generated files into `dist/<docCode>/` and root `dist/` shortcuts.
+
+## Export Pipeline
+
+`export.ps1` expects build output to already exist.
+
+It does the following:
+
+1. Finds Microsoft Edge.
+2. Copies generated HTML files to a temp directory without spaces.
+3. Exports `print.html` to `print.pdf` with A4 settings.
+4. Checks PDF page count against `data.meta.pageCount`.
+5. Captures `share.html` as `share.png` at `1200x1500`.
+6. Copies final artifacts to both `dist/<docCode>/` and shortcut files in `dist/`.
+
+If Edge fails inside a sandbox, run the export in a normal local terminal.
+
+## Data Editing
+
+Most report updates should start in `data/report-data.json`.
+
+Common fields:
+
+- `meta`: report title, period, doc code, issue date, page count.
+- `topbar`: brand and meta labels.
+- `hero`: title, lede, chips, hero stats.
+- `recTable.rows`: recommendation rows and weights.
+- `chart`: daily performance labels and series.
+- `heatmap`: monthly performance table.
+- `stockCards`: card-level metrics by ticker.
+- `contacts`: footer contact details.
+- `legalText`: long disclaimer HTML.
+- `shareCard`: share-card metadata, CTA URL, top picks.
+
+After changing data:
+
+```powershell
+npm run build
+npm run export
+```
+
+## Design And Format Rules
+
+The approved visual reference is:
+
+```text
+references/BSC_Quant_Research_editable_saved.html
+```
+
+The goal is to keep table, chart, font, color, and text treatment consistent with that file. Only global spacing and font sizing should be changed through `theme.config.json` unless the design intentionally changes.
+
+Design token rules:
+
+- Use `theme.config.json` for global colors, type scale, spacing, and radius.
+- Do not set font sizes below `12px`; the build fails this validation.
+- Keep Nunito as the report font unless the brand decision changes.
+- Keep BSC blue as the primary action/heading/ticker color.
+- Keep report outputs readable for PDF and browser review.
+
+## Branch Workflow
+
+Recommended daily flow on `LL`:
+
+```powershell
+git status
+git checkout LL
+git pull --rebase origin LL
 npm run build
 ```
 
-### 4. Xuất PDF
+If `LL` does not exist on a fresh machine:
 
-**Cách A — Nhanh (browser):** Mở `dist/index.html` → nhấn nút **🖨️ Xuất PDF** hoặc `Ctrl+P` → Save as PDF → A4 Portrait
+```powershell
+git fetch origin
+git checkout -b LL origin/LL
+```
 
-**Cách B — Puppeteer (batch/CI):**
-```bash
+Before merging `LL` into `main`:
+
+```powershell
+git status
+npm run build
 npm run export
-# → dist/BSC_Quant_Research_YYYYMMDD.pdf
-
-# Tên custom:
-npm run export -- --output=Q3_2026_Nang_Hang.pdf
+git diff --stat main..LL
 ```
 
----
+Expected merge direction:
 
-## Cập nhật báo cáo mới
-
-### Thay đổi số liệu / nội dung
-
-Chỉ cần sửa `data/report-data.json`, sau đó chạy `npm run build`:
-
-```json
-// data/report-data.json
-{
-  "meta": {
-    "reportTitle": "Danh mục ...",
-    "period": "Q4 2026",
-    "issueDate": "01/10/2026"
-  },
-  "hero": {
-    "heroStats": [
-      { "label": "VN-Index Target", "value": "1,550", ... }
-    ]
-  }
-}
+```text
+LL -> main
 ```
 
-### Thay đổi màu sắc / font size
+Use `gianganh-intheflow-patch-1` as a reference/prototype branch for the alternative Python/module pipeline. Do not mix it into `LL` casually; inspect and cherry-pick intentionally.
 
-Sửa `theme.config.json`:
+## Developer Docs
 
-```json
-{
-  "colors": {
-    "bscBlue": "#295CA9",    ← Màu chủ đạo BSC
-    "bscTeal": "#009B87",    ← Accent teal
-    ...
-  },
-  "typeScale": {
-    "body": { "size": "14px", "weight": 400, ... }
-  }
-}
+Detailed developer guide:
+
+```text
+docs/DEVELOPER_GUIDE.md
 ```
 
-> ⚠️ **Hard rule**: Không được đặt `size` < `12px` trong bất kỳ cấp nào.  
-> Build script sẽ báo lỗi và dừng lại nếu vi phạm.
+AI context guide:
 
-### Thay logo
-
-Đặt file logo vào `assets/img/logo.png`.  
-File PNG nền trong suốt, chiều cao khuyến nghị 80–100px (retina 2x).
-
----
-
-## Inline Editor (trình sửa trực tiếp)
-
-`dist/index.html` có toolbar chỉnh sửa tích hợp:
-
-| Nút | Chức năng |
-|-----|-----------|
-| ✏️ Chỉnh sửa | Bật/tắt chế độ edit — click vào text để sửa |
-| 💾 Lưu | Lưu vào localStorage trình duyệt |
-| ↩ Reset | Xóa state đã lưu, tải lại bản gốc |
-| 🖨️ Xuất PDF | Gọi `window.print()` |
-
-> **Lưu ý quan trọng**: Chỉnh sửa inline là tạm thời (lưu localStorage trên máy đó). Để thay đổi vĩnh viễn và đồng bộ lên GitHub → cập nhật `data/report-data.json` và chạy `npm run build`.
-
----
-
-## Design System
-
-### Color Roles
-
-| Token | Hex | Vai trò |
-|-------|-----|---------|
-| `--bsc-blue` | `#295CA9` | Brand primary, heading, CTA |
-| `--bsc-teal` | `#009B87` | Accent positive, biểu đồ |
-| `--bsc-gold` | `#FFC132` | Highlight badge (dùng <5% diện tích) |
-| `--positive`  | `#16A34A` | Tăng/lãi |
-| `--negative`  | `#DC2626` | Giảm/lỗ/rủi ro |
-| `--text-1`    | `#0F172A` | Heading, số liệu — contrast 19:1 |
-| `--text-2`    | `#475569` | Body text — contrast 7.5:1 |
-| `--text-3`    | `#64748B` | Caption, meta — contrast 4.6:1 ≥ AA |
-
-### Type Scale (Major Second ~1.125)
-
-| Cấp | Size | Dùng cho |
-|-----|------|----------|
-| Display | 38px | Hero numbers |
-| H1 | 28px | Report title |
-| H2 | 22px | Section headings |
-| H3 | 18px | Sub-sections |
-| H4 | 16px | Card headings, tickers |
-| Body-lg | 15px | Lede, key text |
-| Body | 14px | Table data, content |
-| Label | 12px | Uppercase labels (= floor) |
-| Caption | 12px | Notes, disclaimer (= floor) |
-
-**WCAG AA compliance**: Tất cả cặp text/background đạt ≥ 4.5:1.
-
----
-
-## Deploy GitHub
-
-```bash
-git init
-git add .
-git commit -m "feat: BSC Quant Research report system v1.0"
-git remote add origin https://github.com/<your-org>/bsc-quant-research.git
-git push -u origin main
+```text
+docs/AI_CONTEXT.md
 ```
 
-**GitHub Pages** (nếu cần host online):
-```
-Settings → Pages → Source: main branch / dist folder
-```
-
----
-
-## Workflow khuyến nghị
-
-```
-1. Cập nhật số liệu   →  data/report-data.json
-2. Build              →  npm run build
-3. Review trên browser →  npm run preview
-4. Chỉnh sửa nhỏ     →  Dùng Inline Editor (✏️)
-5. Xuất PDF           →  🖨️ Xuất PDF (browser) hoặc npm run export
-6. Commit & push      →  git add . && git commit && git push
-```
-
----
-
-*BSC Securities — Quant Research Division*  
-*© 2026 BSC. Bảo lưu mọi quyền.*
+Read both before making structural changes.
